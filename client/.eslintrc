@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "eqeqeq": "off",
+    "react/jsx-pascal-case": "off",
+    "@typescript-eslint/no-unused-vars": "off"
+  }
+}

@@ -1,0 +1,41 @@
+image: node:20
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - install
+  - build
+  - release
+  - dockerize
+
+install_dependencies:
+  stage: install
+  script:
+    - npm install
+
+build:
+  stage: build
+  script:
+    - npm run build
+
+release:
+  stage: release
+  script:
+    - npx semantic-release
+  only:
+    - development
+
+dockerize:
+  image: docker:latest
+  stage: dockerize
+  services:
+    - docker:dind
+  script:
+    - export VERSION=`npx -c 'echo "$npm_package_version"'`
+    - echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+    - docker build -t $DOCKER_HUB_USERNAME/external-client:$VERSION .
+    - docker push $DOCKER_HUB_USERNAME/external-client:$VERSION
+  only:
+    - development
