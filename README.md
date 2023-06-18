@@ -37,7 +37,7 @@ services:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
 
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/keycloak
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
@@ -88,11 +88,13 @@ POSTGRES_PASSWORD=keycloak
 ```
 
 
-The following environment variables are used in the application:
+The following variables are used in the application:
 
+- `SPRING_PROFILES_ACTIVE`:This is a Spring Boot environment variable used to specify which profile is active in your application. A profile is a named, logical group of settings that can be activated to configure your application for a specific environment. For this application, this variable should be set to either `postgres` or `mysql`, depending on the type of database you're using. For instance, to run the application with a PostgreSQL database, the setting would be `SPRING_PROFILES_ACTIVE=postgres,docker`.
+- `KEYCLOAK_SERVER_URL`:  This is the URL where your Keycloak server is running. For this application, it should be set to `http://keycloak:8080`.
 - `KEYCLOAK_ADMIN`: The username for Keycloak admin.
 - `KEYCLOAK_ADMIN_PASSWORD`: The password for Keycloak admin.
-
+- `SPRING_DATASOURCE_URL`: This is the JDBC URL for your database. For this application, if you are using PostgreSQL, it should be set to `jdbc:postgresql://postgres:5432/${POSTGRES_DB}`.
 - `POSTGRES_DB`: The name of the PostgreSQL database.
 - `POSTGRES_USER`: The username for PostgreSQL.
 - `POSTGRES_PASSWORD`: The password for the PostgreSQL user.
