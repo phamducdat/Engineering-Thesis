@@ -74,8 +74,8 @@ services:
 networks:
   app-network:
 ```
-
 4. Add the following content to the `.env` file:
+
 ```dotenv
 #Keyloack
 KEYCLOAK_ADMIN=admin
