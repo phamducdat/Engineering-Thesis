@@ -3,7 +3,7 @@ version: '3'
 
 services:
   server:
-    image: external-server:latest
+    image: datpd2402/external-server:latest
     container_name: external-server
     environment:
       SPRING_PROFILES_ACTIVE: postgres,docker
