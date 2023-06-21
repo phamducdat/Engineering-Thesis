@@ -1,5 +1,7 @@
 package com.hust.datpd.engineeringthesis.validator;
 
+import com.hust.datpd.engineeringthesis.entity.accountrealm.AccountRealmEntity;
+import com.hust.datpd.engineeringthesis.repository.AccountRealmRepository;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakInstanceFactory;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -16,8 +18,11 @@ public class ValidatorUtil {
 
     private final KeycloakInstanceFactory keycloakInstanceFactory;
 
-    public ValidatorUtil(KeycloakInstanceFactory keycloakInstanceFactory) {
+    final AccountRealmRepository accountRealmRepository;
+
+    public ValidatorUtil(KeycloakInstanceFactory keycloakInstanceFactory, AccountRealmRepository accountRealmRepository) {
         this.keycloakInstanceFactory = keycloakInstanceFactory;
+        this.accountRealmRepository = accountRealmRepository;
     }
 
     public boolean realmExists(String realmName) {
@@ -52,13 +57,17 @@ public class ValidatorUtil {
                 keycloakInstanceFactory.getKeycloakInstance();
         RealmResource realmResource = keycloak.realm(realmName);
 
-
         try {
             UserRepresentation userRepresentation = realmResource.users().get(userId).toRepresentation();
             return userRepresentation != null;
         } catch (NotFoundException ex) {
             return false;
         }
+    }
 
+    public boolean accountRealmExists(String accountName) {
+        AccountRealmEntity entity =
+                accountRealmRepository.findByEmail(accountName);
+        return entity != null;
     }
 }
