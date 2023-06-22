@@ -1,0 +1,35 @@
+version: '3'
+
+
+services:
+  server:
+    image: datpd2402/external-server:latest
+    container_name: external-server
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres,docker
+      KEYCLOAK_SERVER_URL: http://0.0.0.0:8080
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/keycloak
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+  postgres:
+    image: postgres:13.2
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+networks:
+  app-network:
