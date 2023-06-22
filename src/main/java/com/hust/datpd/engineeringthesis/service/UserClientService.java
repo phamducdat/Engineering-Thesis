@@ -9,6 +9,7 @@ import com.hust.datpd.engineeringthesis.repository.UserClientRepository;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -35,6 +36,11 @@ public class UserClientService {
         return mapper.mapFromListEntitiesToClientUserDto(
                 repository.findByIdRealmIdAndIdClientId(realmId, clientId)
         );
+    }
+
+    @Transactional
+    public void deleteAllUserClientsByRealmId(String realmId) {
+        repository.deleteByIdRealmId(realmId);
     }
 
     public UserClientDto getUserClientsByUserId(
