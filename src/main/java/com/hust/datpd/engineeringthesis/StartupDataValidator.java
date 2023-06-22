@@ -17,49 +17,49 @@ import java.util.Objects;
 
 @Component
 public class StartupDataValidator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StartupDataValidator.class);
-
-    final KeycloakInstanceFactory keycloakInstanceFactory;
-
-    final AccountRealmRepository accountRealmRepository;
-
-    final UserClientRepository userClientRepository;
-
-    public StartupDataValidator(KeycloakInstanceFactory keycloakInstanceFactory,
-                                AccountRealmRepository accountRealmRepository,
-                                UserClientRepository userClientRepository) {
-        this.keycloakInstanceFactory = keycloakInstanceFactory;
-        this.accountRealmRepository = accountRealmRepository;
-        this.userClientRepository = userClientRepository;
-    }
-
-    @EventListener
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
-
-        List<RealmRepresentation> realmRepresentations =
-                keycloak.realms().findAll();
-
-        List<AccountRealmEntity> accountRealmEntities =
-                accountRealmRepository.findAll();
-
-        LOGGER.info("Starting validate external database");
-
-        accountRealmEntities.forEach(accountRealmEntity -> {
-            if (realmRepresentations.stream().noneMatch(realmRepresentation -> {
-                return Objects.equals(realmRepresentation.getId(), accountRealmEntity.getId().getRealmId());
-            })) {
-                LOGGER.info("Delete " + accountRealmEntity.getId().getRealmId() + " in AccountRealmEntities");
-                accountRealmRepository.delete(accountRealmEntity);
-                LOGGER.info("Delete " + accountRealmEntity.getId().getRealmId() + " in UserClientEntities");
-                userClientRepository.deleteByIdRealmId(accountRealmEntity.getId().getRealmId());
-            }
-        });
-
-        LOGGER.info("Finish validate external database");
-
-
-    }
+//    private static final Logger LOGGER = LoggerFactory.getLogger(StartupDataValidator.class);
+//
+//    final KeycloakInstanceFactory keycloakInstanceFactory;
+//
+//    final AccountRealmRepository accountRealmRepository;
+//
+//    final UserClientRepository userClientRepository;
+//
+//    public StartupDataValidator(KeycloakInstanceFactory keycloakInstanceFactory,
+//                                AccountRealmRepository accountRealmRepository,
+//                                UserClientRepository userClientRepository) {
+//        this.keycloakInstanceFactory = keycloakInstanceFactory;
+//        this.accountRealmRepository = accountRealmRepository;
+//        this.userClientRepository = userClientRepository;
+//    }
+//
+//    @EventListener
+//    public void onApplicationEvent(ApplicationReadyEvent event) {
+//        Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
+//
+//        List<RealmRepresentation> realmRepresentations =
+//                keycloak.realms().findAll();
+//
+//        List<AccountRealmEntity> accountRealmEntities =
+//                accountRealmRepository.findAll();
+//
+//        LOGGER.info("Starting validate external database");
+//
+//        accountRealmEntities.forEach(accountRealmEntity -> {
+//            if (realmRepresentations.stream().noneMatch(realmRepresentation -> {
+//                return Objects.equals(realmRepresentation.getId(), accountRealmEntity.getId().getRealmId());
+//            })) {
+//                LOGGER.info("Delete " + accountRealmEntity.getId().getRealmId() + " in AccountRealmEntities");
+//                accountRealmRepository.delete(accountRealmEntity);
+//                LOGGER.info("Delete " + accountRealmEntity.getId().getRealmId() + " in UserClientEntities");
+//                userClientRepository.deleteByIdRealmId(accountRealmEntity.getId().getRealmId());
+//            }
+//        });
+//
+//        LOGGER.info("Finish validate external database");
+//
+//
+//    }
 
 
 }
