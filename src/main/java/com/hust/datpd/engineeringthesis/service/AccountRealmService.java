@@ -9,6 +9,7 @@ import com.hust.datpd.engineeringthesis.repository.AccountRealmRepository;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,11 @@ public class AccountRealmService {
         this.keycloakService = keycloakService;
         this.repository = repository;
         this.mapper = mapper;
+    }
+
+    @Transactional
+    public void deleteAccountRealmByRealmId(String realmId) {
+        repository.deleteByIdRealmId(realmId);
     }
 
     public AccountDto findByUsername(String username) {

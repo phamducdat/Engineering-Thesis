@@ -1,10 +1,13 @@
 package com.hust.datpd.engineeringthesis.service.keycloak;
 
+import com.hust.datpd.engineeringthesis.StartupDataValidator;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
@@ -23,11 +26,18 @@ public class KeycloakService {
 
     private final KeycloakInstanceFactory keycloakInstanceFactory;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartupDataValidator.class);
+
+
     public KeycloakService(ServerProperties serverProperties, KeycloakInstanceFactory keycloakInstanceFactory) {
         this.serverProperties = serverProperties;
         this.keycloakInstanceFactory = keycloakInstanceFactory;
     }
 
+
+    public Keycloak getKeycloak() {
+        return keycloakInstanceFactory.getKeycloakInstance();
+    }
 
     public RealmResource getRealmResourceByRealmId(String realmId) {
         Keycloak keycloak =
@@ -51,7 +61,7 @@ public class KeycloakService {
         } catch (ClientErrorException e) {
             Response response = e.getResponse();
             String errorMessage = response.readEntity(String.class);
-            System.out.println("Failed to create realm. Error message: " + errorMessage);
+            LOGGER.error("Failed to create realm. Error message: " + errorMessage);
             throw e;
         }
     }

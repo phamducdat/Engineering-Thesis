@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Form, Input, Row} from "antd";
+import {Button, Card, Form, Input, message, Row} from "antd";
 import {getRealmByUsername, getToken} from "../../api/admin";
 import {useNavigate} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
@@ -27,6 +27,8 @@ export const Login: React.FC = () => {
                     navigate(`/realm/${realm}/managers/domain`)
                 }
             })
+        }).catch((error) => {
+            message.error(error.response.data.errorMessage)
         }).finally(() => {
             setLoading(false)
         })

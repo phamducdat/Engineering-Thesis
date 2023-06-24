@@ -11,4 +11,6 @@ public interface AccountRealmRepository extends JpaRepository<AccountRealmEntity
 
     AccountRealmEntity findById_RealmId(String realmId);
     AccountRealmEntity findByEmail(String userName);
+
+    void deleteByIdRealmId(String realmId);
 }
