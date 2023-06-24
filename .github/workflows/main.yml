@@ -5,7 +5,7 @@ on:
     branches:
       - '**'
     tags:
-      - *
+      - '*'
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
