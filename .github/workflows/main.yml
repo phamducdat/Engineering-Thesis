@@ -25,10 +25,12 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
           cache: maven
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '20.0.0'
+
       - name: Build Frontend
         run: |
           cd client
@@ -44,6 +46,7 @@ jobs:
         with:
           name: target
           path: target/*.jar
+
   dockerize:
     name: Dockerize
     needs: build
@@ -58,8 +61,14 @@ jobs:
           echo "Invalid tag format. Tags should contain only numbers and dots."
           exit 1
           fi
+
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: target
 
       - name: Docker login
         run: echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin
@@ -72,4 +81,3 @@ jobs:
           docker push $IMAGE_NAME:$TAG_NAME
           docker tag $IMAGE_NAME:$TAG_NAME $IMAGE_NAME:latest
           docker push $IMAGE_NAME:latest
-
