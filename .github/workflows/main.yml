@@ -37,7 +37,7 @@ jobs:
           cd ..
 
       - name: Build with Maven
-        run: mvn clean package spring-boot:repackage -DskipTests
+        run: mvn clean install
   dockerize:
     name: Dockerize
     needs: build
@@ -57,5 +57,5 @@ jobs:
           docker push $IMAGE_NAME:$TAG_NAME
           docker tag $IMAGE_NAME:$TAG_NAME $IMAGE_NAME:latest
           docker push $IMAGE_NAME:latest
-        if: startsWith(github.ref, 'refs/tags/')
+  if: startsWith(github.ref, 'refs/tags/')
 
