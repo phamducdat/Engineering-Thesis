@@ -38,6 +38,12 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: target
+          path: target/*.jar
   dockerize:
     name: Dockerize
     needs: build
