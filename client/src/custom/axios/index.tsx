@@ -46,9 +46,9 @@ export const refreshAccessToken = async () => {
 
         return response.data?.access_token;
     } catch (error) {
-        if (window.location.pathname != "/login" && window.location.pathname != "/registration") {
-            window.location.href = '/login';
-        }
+        // if (window.location.pathname != "/login" && window.location.pathname != "/registration") {
+        //     window.location.href = '/login';
+        // }
     }
 }
 

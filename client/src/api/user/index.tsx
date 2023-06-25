@@ -7,6 +7,12 @@ export const getUsersWithoutAdmin = async (realm: string | undefined) => {
 }
 
 
+export const getUsers = async (realm: string | undefined) => {
+    const response = await DP_axios.get(`/admin/realms/${realm}/users`)
+    return response?.data
+}
+
+
 export const getUserById = async (realm: string | undefined,
                                   userId: string | undefined) => {
     const response = await DP_axios.get(`/admin/realms/${realm}/users/${userId}`)

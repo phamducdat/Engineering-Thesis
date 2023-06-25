@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {deleteUser, getUsersWithoutAdmin} from "../../../api/user";
+import {deleteUser, getUsers} from "../../../api/user";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {Button, Tabs} from "antd";
 import {useRootContext} from "../../root/context/useRootContext";
 import DP_Tabs from "../../../custom/data-display/tabs";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
-import Table from "@datpd/packages";
-import TabPane = Tabs.TabPane;
 import {DP_Table} from "../../../custom/data-display/table";
+import {getMe} from "../../../api/admin";
+import TabPane = Tabs.TabPane;
 
 export const User: React.FC = () => {
     const {realmId} = useParams()
@@ -18,7 +18,7 @@ export const User: React.FC = () => {
 
     function initData() {
         setSpinning(true)
-        getUsersWithoutAdmin(realmId).then(response => {
+        getUsers(realmId).then(response => {
             setDataSource(response)
             setSpinning(false)
         })
@@ -78,18 +78,21 @@ export const User: React.FC = () => {
             key: "resetPassword",
             width: "7%",
             render: (userId: string, record: any) => {
+
                 return <>
 
-                    <DeleteOption content={record.username} type={"tài khoản"} onOk={
-                        () => {
-                            setSpinning(true)
-                            deleteUser(realmId, userId).then(() => {
-                                setSpinning(false)
-                                setReloadData("user")
-                            })
-                        }
+                    {
+                        getMe().sub !== record.id &&
+                        <DeleteOption content={record.username} type={"tài khoản"} onOk={
+                            () => {
+                                setSpinning(true)
+                                deleteUser(realmId, userId).then(() => {
+                                    setSpinning(false)
+                                    setReloadData("user")
+                                })
+                            }
 
-                    }/>
+                        }/>}
                 </>
 
 

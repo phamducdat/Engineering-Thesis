@@ -3,6 +3,11 @@ import DP_axios from "../../custom/axios";
 const baseExternalUrl = `${process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL}/external/v1`
 
 
+export const loginAdminAccount = async (data: any) => {
+    const response = await DP_axios.post(`${baseExternalUrl}/admin/keycloak/login`, data)
+    return response?.data || []
+}
+
 export const registration = async (data: any) => {
     const response = await DP_axios.post(`${baseExternalUrl}/registrations`, data)
     return response?.data || []

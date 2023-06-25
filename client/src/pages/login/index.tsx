@@ -3,6 +3,8 @@ import {Button, Card, Form, Input, message, Row} from "antd";
 import {getRealmByUsername, getToken} from "../../api/admin";
 import {useNavigate} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
+import {loginAdminAccount} from "../../api/external";
+import { response } from "express";
 
 
 export const Login: React.FC = () => {
@@ -17,21 +19,35 @@ export const Login: React.FC = () => {
     const onFinish = (values: any) => {
 
         setLoading(true)
-        getRealmByUsername(values?.username).then((response) => {
-            const realm = response.realm
-            getToken(realm, values?.username, values?.password).then((response) => {
-                if (response) {
-                    localStorage.setItem("access_token", response?.access_token)
-                    localStorage.setItem("refresh_token", response?.refresh_token)
-                    localStorage.setItem("token_type", response?.token_type)
-                    navigate(`/realm/${realm}/managers/domain`)
-                }
-            })
-        }).catch((error) => {
-            message.error(error.response.data.errorMessage)
+
+
+        loginAdminAccount(values).then((response) => {
+            if (response) {
+                localStorage.setItem("access_token", response?.access_token)
+                localStorage.setItem("refresh_token", response?.refresh_token)
+                localStorage.setItem("token_type", response?.token_type)
+                navigate(`/realm/master/managers/domain`)
+            }
         }).finally(() => {
             setLoading(false)
         })
+
+
+        // getRealmByUsername(values?.username).then((response) => {
+        //     const realm = response.realm
+        //     getToken(realm, values?.username, values?.password).then((response) => {
+        //         if (response) {
+        //             localStorage.setItem("access_token", response?.access_token)
+        //             localStorage.setItem("refresh_token", response?.refresh_token)
+        //             localStorage.setItem("token_type", response?.token_type)
+        //             navigate(`/realm/${realm}/managers/domain`)
+        //         }
+        //     })
+        // }).catch((error) => {
+        //     message.error(error.response.data.errorMessage)
+        // }).finally(() => {
+        //     setLoading(false)
+        // })
 
 
     };
