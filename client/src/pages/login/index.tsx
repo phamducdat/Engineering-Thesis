@@ -92,13 +92,13 @@ export const Login: React.FC = () => {
                         Đăng nhập
                     </Button>
 
-                    <Button
-                        onClick={() => {
-                            navigate("/registration")
-                        }}
-                    >
-                        Đăng ký
-                    </Button>
+                    {/*<Button*/}
+                    {/*    onClick={() => {*/}
+                    {/*        navigate("/registration")*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    Đăng ký*/}
+                    {/*</Button>*/}
                 </Row>
 
             </Card>
