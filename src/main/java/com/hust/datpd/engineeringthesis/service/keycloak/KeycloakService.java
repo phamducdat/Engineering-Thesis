@@ -5,6 +5,7 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,12 @@ public class KeycloakService {
 
     public Keycloak getKeycloak() {
         return keycloakInstanceFactory.getKeycloakInstance();
+    }
+
+    public AccessTokenResponse getAdminKeycloakAccessToken() {
+        Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
+
+        return keycloak.tokenManager().getAccessToken();
     }
 
     public RealmResource getRealmResourceByRealmId(String realmId) {

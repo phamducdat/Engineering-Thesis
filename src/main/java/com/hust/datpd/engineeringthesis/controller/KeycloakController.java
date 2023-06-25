@@ -1,9 +1,13 @@
 package com.hust.datpd.engineeringthesis.controller;
 
+import com.hust.datpd.engineeringthesis.dto.AdminKeycloakDto;
 import com.hust.datpd.engineeringthesis.dto.KeycloakInfoDto;
 import com.hust.datpd.engineeringthesis.dto.RealmDto;
+import com.hust.datpd.engineeringthesis.message.ErrorResponse;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
+import com.hust.datpd.engineeringthesis.validator.ValidatorUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +19,14 @@ public class KeycloakController {
     final
     KeycloakService keycloakService;
 
+    final ValidatorUtil validatorUtil;
+
     @Value("${keycloak.serverUrl}")
     private String keycloakServerUrl;
 
-    public KeycloakController(KeycloakService keycloakService) {
+    public KeycloakController(KeycloakService keycloakService, ValidatorUtil validatorUtil) {
         this.keycloakService = keycloakService;
+        this.validatorUtil = validatorUtil;
     }
 
 
@@ -28,6 +35,20 @@ public class KeycloakController {
         KeycloakInfoDto keycloakInfoDto = new KeycloakInfoDto();
         keycloakInfoDto.setKeycloakServerUrl(keycloakServerUrl);
         return ResponseEntity.ok(keycloakInfoDto);
+
+    }
+
+    @PostMapping("/keycloak/login")
+    public ResponseEntity<?> getAdminKeycloakToken(@RequestBody
+                                                   AdminKeycloakDto from) {
+        if (!validatorUtil.adminKeycloakValid(from.getUsername(),
+                from.getPassword()))
+            return ResponseEntity.status(
+                    HttpStatus.UNAUTHORIZED
+            ).body(
+                    new ErrorResponse("Tài khoản hoặc mật khẩu không hợp lệ")
+            );
+        return ResponseEntity.ok(keycloakService.getAdminKeycloakAccessToken());
 
     }
 

@@ -8,14 +8,22 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class ValidatorUtil {
 
+
+    @Value("${keycloak.username}")
+    private String keycloakUsername;
+
+    @Value("${keycloak.password}")
+    private String keycloakPassword;
     private final KeycloakInstanceFactory keycloakInstanceFactory;
 
     final AccountRealmRepository accountRealmRepository;
@@ -23,6 +31,13 @@ public class ValidatorUtil {
     public ValidatorUtil(KeycloakInstanceFactory keycloakInstanceFactory, AccountRealmRepository accountRealmRepository) {
         this.keycloakInstanceFactory = keycloakInstanceFactory;
         this.accountRealmRepository = accountRealmRepository;
+    }
+
+
+    public boolean adminKeycloakValid(String username,
+                                      String password) {
+        return Objects.equals(username, keycloakUsername) &&
+                Objects.equals(password, keycloakPassword);
     }
 
     public boolean realmExists(String realmName) {
