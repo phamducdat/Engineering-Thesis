@@ -25,7 +25,7 @@ public class StartupDataValidator {
 
     @EventListener
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        LOGGER.info("Add app URL to master realm");
+        LOGGER.info("Add app URL if they do not exist in the master realm");
         keycloakService.addWebOriginToAdminCli(keycloakRealm);
     }
 

@@ -245,4 +245,22 @@ public class KeycloakService {
         else return null;
 
     }
+
+    public String getIdOfClientByRealmNameAndUrl(String realmName,
+                                                 String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        List<ClientRepresentation> clientRepresentationList =
+                realmResource.clients().findAll();
+
+        for (ClientRepresentation element : clientRepresentationList) {
+            if (Objects.equals(element.getRootUrl(), url))
+                return element.getId();
+        }
+
+        return null;
+    }
 }
