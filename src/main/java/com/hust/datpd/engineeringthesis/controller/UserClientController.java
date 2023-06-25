@@ -42,7 +42,7 @@ public class UserClientController {
             @PathVariable String userId) {
         if (!validatorUtil.realmExists(realmId))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Không tồn realmId"));
-        if (!validatorUtil.clientExists(realmId, clientId))
+        if (!validatorUtil.clientExistsByClientId(realmId, clientId))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Không tồn clientId"));
         if (!validatorUtil.userExists(realmId, userId))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Không tồn tại userId"));

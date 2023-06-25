@@ -1,6 +1,7 @@
 package com.hust.datpd.engineeringthesis.controller;
 
 import com.hust.datpd.engineeringthesis.dto.AdminKeycloakDto;
+import com.hust.datpd.engineeringthesis.dto.ClientDto;
 import com.hust.datpd.engineeringthesis.dto.KeycloakInfoDto;
 import com.hust.datpd.engineeringthesis.dto.RealmDto;
 import com.hust.datpd.engineeringthesis.message.ErrorResponse;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/external/v1/admin")
+@RequestMapping("/external/v1/admin/keycloak")
 public class KeycloakController {
 
     final
@@ -24,13 +25,16 @@ public class KeycloakController {
     @Value("${keycloak.serverUrl}")
     private String keycloakServerUrl;
 
+    @Value("${keycloak.realm}")
+    private String realm;
+
     public KeycloakController(KeycloakService keycloakService, ValidatorUtil validatorUtil) {
         this.keycloakService = keycloakService;
         this.validatorUtil = validatorUtil;
     }
 
 
-    @GetMapping("/keycloak/info")
+    @GetMapping("/info")
     public ResponseEntity<KeycloakInfoDto> getKeycloakInfo() {
         KeycloakInfoDto keycloakInfoDto = new KeycloakInfoDto();
         keycloakInfoDto.setKeycloakServerUrl(keycloakServerUrl);
@@ -38,7 +42,7 @@ public class KeycloakController {
 
     }
 
-    @PostMapping("/keycloak/login")
+    @PostMapping("/login")
     public ResponseEntity<?> getAdminKeycloakToken(@RequestBody
                                                    AdminKeycloakDto from) {
         if (!validatorUtil.adminKeycloakValid(from.getUsername(),
@@ -50,6 +54,24 @@ public class KeycloakController {
             );
         return ResponseEntity.ok(keycloakService.getAdminKeycloakAccessToken());
 
+    }
+
+    @PostMapping("/clients")
+    public ResponseEntity<?> createClient(@RequestBody ClientDto from) {
+        if (validatorUtil.clientExistsByClientId(realm, from.getClientId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ErrorResponse("Đã tồn tại domainId")
+            );
+        }
+        if (validatorUtil.clientExistsByURL(realm, from.getUrl())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ErrorResponse("Đã tồn tại url")
+            );
+        }
+
+        keycloakService.createClient(realm, from.getClientId(), from.getUrl());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
     @PostMapping("/realms")

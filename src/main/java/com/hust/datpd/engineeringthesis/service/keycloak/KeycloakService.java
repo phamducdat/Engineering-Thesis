@@ -72,6 +72,25 @@ public class KeycloakService {
         }
     }
 
+    public void createClient(String realmName,
+                             String clientId,
+                             String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        ClientRepresentation clientRepresentation = new ClientRepresentation();
+
+        clientRepresentation.setClientId(clientId);
+        clientRepresentation.setAdminUrl(url);
+        clientRepresentation.setWebOrigins(Collections.singletonList(url));
+        clientRepresentation.setBaseUrl(url);
+        clientRepresentation.setRootUrl(url);
+
+        realmResource.clients().create(clientRepresentation);
+    }
+
 
     public void addWebOriginToAdminCli(String realmName) {
         Keycloak keycloak =

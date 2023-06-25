@@ -50,20 +50,31 @@ public class ValidatorUtil {
         } catch (NotFoundException ex) {
             return false;
         }
-
     }
 
-    public boolean clientExists(String realmName, String clientName) {
+    public boolean clientExistsByClientId(String realmName, String clientId) {
 
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
         RealmResource realmResource = keycloak.realm(realmName);
 
         List<ClientRepresentation> clientRepresentations =
-                realmResource.clients().findByClientId(clientName);
+                realmResource.clients().findByClientId(clientId);
 
         return clientRepresentations.size() > 0;
 
+    }
+
+    public Boolean clientExistsByURL(String realmName, String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        List<ClientRepresentation> clientRepresentationList = realmResource.clients().findAll();
+
+        return clientRepresentationList.stream().anyMatch(element -> {
+            return Objects.equals(element.getRootUrl(), url);
+        });
     }
 
     public boolean userExists(String realmName, String userId) {
