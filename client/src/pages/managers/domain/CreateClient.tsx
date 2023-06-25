@@ -1,10 +1,10 @@
 import {Button, Col, Form, Input, ModalProps, Row} from "antd";
 import React, {useEffect} from "react";
 import {DP_Form} from "../../../custom/data-entry/form";
-import {createClient} from "../../../api/clients";
 import {useNavigate, useParams} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {useRootContext} from "../../root/context/useRootContext";
+import {createClient} from "../../../api/external";
 
 export const CreateClient: React.FC<ModalProps> = props => {
 
@@ -20,13 +20,9 @@ export const CreateClient: React.FC<ModalProps> = props => {
     }, [])
 
     const onFinish = (value: any) => {
-        createClient(realmId, {
+        createClient({
             ...value,
-            "enabled": true,
             "id": id,
-            "attributes": {},
-            "redirectUris": [],
-            "protocol": "openid-connect"
         }).then((response) => {
             navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=permissions`)
         })
