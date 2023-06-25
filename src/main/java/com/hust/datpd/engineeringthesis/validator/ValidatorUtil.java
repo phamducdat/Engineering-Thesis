@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class ValidatorUtil {
@@ -65,6 +66,23 @@ public class ValidatorUtil {
 
     }
 
+
+    public boolean clientExistsByClientId(String realmName, String id, String clientId) {
+
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        List<ClientRepresentation> clientRepresentations =
+                realmResource.clients().findByClientId(clientId).stream().filter(element -> {
+                    return !Objects.equals(element.getId(), id);
+                }).collect(Collectors.toList());
+
+        return !clientRepresentations.isEmpty();
+
+    }
+
+
     public Boolean clientExistsByURL(String realmName, String url) {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
@@ -76,6 +94,19 @@ public class ValidatorUtil {
             return Objects.equals(element.getRootUrl(), url);
         });
     }
+
+    public Boolean clientExistsByURL(String realmName, String id, String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        List<ClientRepresentation> clientRepresentationList = realmResource.clients().findAll();
+
+        return clientRepresentationList.stream().anyMatch(element -> {
+            return !Objects.equals(element.getId(), id) && Objects.equals(element.getRootUrl(), url);
+        });
+    }
+
 
     public boolean userExists(String realmName, String userId) {
 

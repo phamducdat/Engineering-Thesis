@@ -1,9 +1,6 @@
 package com.hust.datpd.engineeringthesis.controller;
 
-import com.hust.datpd.engineeringthesis.dto.AdminKeycloakDto;
-import com.hust.datpd.engineeringthesis.dto.ClientDto;
-import com.hust.datpd.engineeringthesis.dto.KeycloakInfoDto;
-import com.hust.datpd.engineeringthesis.dto.RealmDto;
+import com.hust.datpd.engineeringthesis.dto.*;
 import com.hust.datpd.engineeringthesis.message.ErrorResponse;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import com.hust.datpd.engineeringthesis.validator.ValidatorUtil;
@@ -57,7 +54,7 @@ public class KeycloakController {
     }
 
     @PostMapping("/clients")
-    public ResponseEntity<?> createClient(@RequestBody ClientDto from) {
+    public ResponseEntity<?> createClient(@RequestBody CreateClientDto from) {
         if (validatorUtil.clientExistsByClientId(realm, from.getClientId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại domainId")
@@ -69,7 +66,28 @@ public class KeycloakController {
             );
         }
 
-        keycloakService.createClient(realm, from.getClientId(), from.getUrl());
+        keycloakService.createClient(realm, from.getId(),
+                from.getClientId(), from.getUrl());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+
+    @PutMapping("/clients/{id}")
+    public ResponseEntity<?> updateClient(@RequestBody UpdateClientDto from,
+                                          @PathVariable String id) {
+        if (validatorUtil.clientExistsByClientId(realm, id, from.getClientId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ErrorResponse("Đã tồn tại domainId")
+            );
+        }
+        if (validatorUtil.clientExistsByURL(realm, id, from.getUrl())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ErrorResponse("Đã tồn tại url")
+            );
+        }
+
+        keycloakService.updateClient(realm, id, from.getClientId(), from.getUrl());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }

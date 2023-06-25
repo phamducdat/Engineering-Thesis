@@ -72,7 +72,31 @@ public class KeycloakService {
         }
     }
 
+    public void updateClient(String realmName,
+                             String id,
+                             String clientId,
+                             String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        ClientRepresentation clientRepresentation =
+                realmResource.clients().get(id).toRepresentation();
+
+        clientRepresentation.setClientId(clientId);
+
+        clientRepresentation.setAdminUrl(url);
+        clientRepresentation.setWebOrigins(Collections.singletonList(url));
+        clientRepresentation.setRedirectUris(Collections.singletonList(url));
+        clientRepresentation.setBaseUrl(url);
+        clientRepresentation.setRootUrl(url);
+
+        realmResource.clients().get(id).update(clientRepresentation);
+    }
+
     public void createClient(String realmName,
+                             String id,
                              String clientId,
                              String url) {
         Keycloak keycloak =
@@ -82,11 +106,19 @@ public class KeycloakService {
 
         ClientRepresentation clientRepresentation = new ClientRepresentation();
 
+        clientRepresentation.setId(id);
         clientRepresentation.setClientId(clientId);
+
         clientRepresentation.setAdminUrl(url);
         clientRepresentation.setWebOrigins(Collections.singletonList(url));
+        clientRepresentation.setRedirectUris(Collections.singletonList(url));
         clientRepresentation.setBaseUrl(url);
         clientRepresentation.setRootUrl(url);
+
+
+        clientRepresentation.setAttributes(null);
+        clientRepresentation.setProtocol("openid-connect");
+        clientRepresentation.setEnabled(true);
 
         realmResource.clients().create(clientRepresentation);
     }
