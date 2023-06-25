@@ -1,10 +1,16 @@
-import DP_axios from "../../custom/axios";
+import DP_axios, {CustomAxiosRequestConfig} from "../../custom/axios";
 
 const baseExternalUrl = `${process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL}/external/v1`
 
 
 export const loginAdminAccount = async (data: any) => {
-    const response = await DP_axios.post(`${baseExternalUrl}/admin/keycloak/login`, data)
+    const config: CustomAxiosRequestConfig = {
+        customMessage: {
+            message: "Welcome!",
+            type: "success"
+        }
+    }
+    const response = await DP_axios.post(`${baseExternalUrl}/admin/keycloak/login`, data, config)
     return response?.data || []
 }
 
