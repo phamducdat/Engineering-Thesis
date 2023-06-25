@@ -11,10 +11,14 @@ const UserSession: React.FC = () => {
     const {realmId, userId} = useParams()
     const [dataSource, setDataSource] = useState()
 
-    useEffect(() => {
+    function getData() {
         getSessionsByUserId(realmId, userId).then((response) => {
             setDataSource(response)
         })
+    }
+
+    useEffect(() => {
+        getData();
     }, [])
 
 
@@ -44,7 +48,7 @@ const UserSession: React.FC = () => {
             title: <>
                 <Button onClick={() => {
                     logoutUserByUserId(realmId, userId).then(() => {
-
+                        getData()
                     })
                 }}>
                     Thoát đăng nhập tất cả
@@ -59,6 +63,7 @@ const UserSession: React.FC = () => {
                     onClick={() => {
                         logoutUserSessionSessionId(realmId,
                             text).then(() => {
+                            getData()
                         })
                     }
                     }

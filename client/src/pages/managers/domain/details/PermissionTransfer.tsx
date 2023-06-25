@@ -4,6 +4,7 @@ import {createClientUsers, deleteClientUsers, getClientUsersByClientId} from "..
 import {TransferDirection} from "antd/es/transfer";
 import {Transfer} from "antd";
 import {getUsers} from "../../../../api/user";
+import {getMe} from "../../../../api/admin";
 
 interface RecordType {
     key: string;
@@ -30,13 +31,14 @@ export const PermissionTransfer: React.FC<{}> = props => {
         })
 
         getUsers(realmId).then((response) => {
-            const convertData = response.map((item: any) => {
-                return {
-                    key: item.id,
-                    title: item.username,
-
-                }
-            })
+            const convertData = response
+                .filter((data: any) => data.id !== getMe().sub)
+                .map((item: any) => {
+                    return {
+                        key: item.id,
+                        title: item.username,
+                    }
+                })
             setDataSource(convertData)
         })
     }, [])
