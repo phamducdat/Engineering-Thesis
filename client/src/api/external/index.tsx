@@ -1,16 +1,11 @@
-import DP_axios, {CustomAxiosRequestConfig} from "../../custom/axios";
+import DP_axios from "../../custom/axios";
+import axios from "axios";
 
-const baseExternalUrl = `${process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL}/external/v1`
+const baseExternalUrl = `/external/v1`
 
 
 export const loginAdminAccount = async (data: any) => {
-    const config: CustomAxiosRequestConfig = {
-        customMessage: {
-            message: "Welcome!",
-            type: "success"
-        }
-    }
-    const response = await DP_axios.post(`${baseExternalUrl}/admin/keycloak/login`, data, config)
+    const response = await axios.post(`${baseExternalUrl}/admin/keycloak/login`, data)
     return response?.data || []
 }
 
@@ -34,7 +29,7 @@ export const registration = async (data: any) => {
 
 
 export const getKeycloakUrl = async () => {
-    const response = await DP_axios.get(`${baseExternalUrl}/admin/keycloak/info`)
+    const response = await axios.get(`${baseExternalUrl}/admin/keycloak/info`)
     if (response) {
         localStorage.setItem("keycloakUrl", response?.data?.keycloakServerUrl)
     }
