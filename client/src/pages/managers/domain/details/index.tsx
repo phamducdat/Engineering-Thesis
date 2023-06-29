@@ -1,15 +1,15 @@
 import React, {useEffect} from 'react';
 import {useParams} from "react-router-dom";
-import {getClientById, updateClientById} from "../../../../api/clients";
+import {getClientById} from "../../../../api/clients";
 import {Button, Col, Form, Input, Row, Tabs} from "antd";
 import {useRootContext} from "../../../root/context/useRootContext";
 import {DP_Form} from "../../../../custom/data-entry/form";
 import DP_Tabs from "../../../../custom/data-display/tabs";
-import Installation from "./Installation";
 import UserSession from "./UserSession";
 import Revocation from "./Revocation";
-import TabPane = Tabs.TabPane;
 import {PermissionTransfer} from "./PermissionTransfer";
+import TabPane = Tabs.TabPane;
+import {updateClient} from "../../../../api/external";
 
 
 const DomainDetails: React.FC<{}> = (props) => {
@@ -27,7 +27,7 @@ const DomainDetails: React.FC<{}> = (props) => {
     }, [])
 
     const onFinish = (value: any) => {
-        updateClientById(realmId, domainId, value).then((response) => {
+        updateClient(domainId, value).then((response) => {
         })
     }
 

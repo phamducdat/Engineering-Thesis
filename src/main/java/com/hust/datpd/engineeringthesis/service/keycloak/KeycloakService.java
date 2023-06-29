@@ -5,6 +5,7 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,11 @@ public class KeycloakService {
         return keycloakInstanceFactory.getKeycloakInstance();
     }
 
+    public AccessTokenResponse getAdminKeycloakAccessToken() {
+        Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
+        return keycloak.tokenManager().getAccessToken();
+    }
+
     public RealmResource getRealmResourceByRealmId(String realmId) {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
@@ -66,8 +72,59 @@ public class KeycloakService {
         }
     }
 
+    public void updateClient(String realmName,
+                             String id,
+                             String clientId,
+                             String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
 
-    private void addWebOriginToAdminCli(String realmName) {
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        ClientRepresentation clientRepresentation =
+                realmResource.clients().get(id).toRepresentation();
+
+        clientRepresentation.setClientId(clientId);
+
+        clientRepresentation.setAdminUrl(url);
+        clientRepresentation.setWebOrigins(Collections.singletonList(url));
+        clientRepresentation.setRedirectUris(Collections.singletonList(url));
+        clientRepresentation.setBaseUrl(url);
+        clientRepresentation.setRootUrl(url);
+
+        realmResource.clients().get(id).update(clientRepresentation);
+    }
+
+    public void createClient(String realmName,
+                             String id,
+                             String clientId,
+                             String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        ClientRepresentation clientRepresentation = new ClientRepresentation();
+
+        clientRepresentation.setId(id);
+        clientRepresentation.setClientId(clientId);
+
+        clientRepresentation.setAdminUrl(url);
+        clientRepresentation.setWebOrigins(Collections.singletonList(url));
+        clientRepresentation.setRedirectUris(Collections.singletonList(url));
+        clientRepresentation.setBaseUrl(url);
+        clientRepresentation.setRootUrl(url);
+
+
+        clientRepresentation.setAttributes(null);
+        clientRepresentation.setProtocol("openid-connect");
+        clientRepresentation.setEnabled(true);
+
+        realmResource.clients().create(clientRepresentation);
+    }
+
+
+    public void addWebOriginToAdminCli(String realmName) {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -84,7 +141,8 @@ public class KeycloakService {
             ClientRepresentation adminCliClient = adminCliClientOptional.get();
 
             // Get the current WebOrigins or create a new list
-            List<String> webOrigins = adminCliClient.getWebOrigins() != null ? adminCliClient.getWebOrigins() : new ArrayList<>();
+            List<String> webOrigins = adminCliClient.getWebOrigins() != null ?
+                    adminCliClient.getWebOrigins() : new ArrayList<>();
 
             String address;
             if (serverProperties.getAddress() != null) {
@@ -95,9 +153,21 @@ public class KeycloakService {
             int port = serverProperties.getPort();
             String url = address + ":" + port;
             // Add the new WebOrigin
-            if (frontendUrl != null)
+
+
+            if (frontendUrl != null && webOrigins.stream().noneMatch(element -> {
+                return Objects.equals(element, frontendUrl);
+            })) {
+                LOGGER.info("Add frontendURL like web origin in master realm");
                 webOrigins.add(frontendUrl);
-            webOrigins.add(url);
+            }
+
+            if (webOrigins.stream().noneMatch(element -> {
+                return Objects.equals(url, element);
+            })) {
+                LOGGER.info("Add backendURL like web origin in master realm");
+                webOrigins.add(url);
+            }
 
             // Update the WebOrigins
             adminCliClient.setWebOrigins(webOrigins);
@@ -174,5 +244,23 @@ public class KeycloakService {
             return clientRepresentation.getId();
         else return null;
 
+    }
+
+    public String getIdOfClientByRealmNameAndUrl(String realmName,
+                                                 String url) {
+        Keycloak keycloak =
+                keycloakInstanceFactory.getKeycloakInstance();
+
+        RealmResource realmResource = keycloak.realm(realmName);
+
+        List<ClientRepresentation> clientRepresentationList =
+                realmResource.clients().findAll();
+
+        for (ClientRepresentation element : clientRepresentationList) {
+            if (Objects.equals(element.getRootUrl(), url))
+                return element.getId();
+        }
+
+        return null;
     }
 }

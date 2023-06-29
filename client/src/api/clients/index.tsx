@@ -13,11 +13,11 @@ export const getClientById = async (realmId: string | undefined,
 }
 
 
-export const createClient = async (realmId: string | undefined, data: object) => {
-    const response = await DP_axios.post(`/admin/realms/${realmId}/clients`, data)
-    return response?.data || []
-}
-
+// export const createClient = async (realmId: string | undefined, data: object) => {
+//     const response = await DP_axios.post(`/admin/realms/${realmId}/clients`, data)
+//     return response?.data || []
+// }
+//
 export const updateClientById = async (realmId: string | undefined,
                                        clientId: string | undefined,
                                        data: any) => {

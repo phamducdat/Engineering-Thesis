@@ -3,7 +3,8 @@ import {useParams} from "react-router-dom";
 import {createClientUsers, deleteClientUsers, getClientUsersByClientId} from "../../../../api/external";
 import {TransferDirection} from "antd/es/transfer";
 import {Transfer} from "antd";
-import {getUsersWithoutAdmin} from "../../../../api/user";
+import {getUsers} from "../../../../api/user";
+import {getMe} from "../../../../api/admin";
 
 interface RecordType {
     key: string;
@@ -29,14 +30,15 @@ export const PermissionTransfer: React.FC<{}> = props => {
             setFlag(true)
         })
 
-        getUsersWithoutAdmin(realmId).then((response) => {
-            const convertData = response.map((item: any) => {
-                return {
-                    key: item.id,
-                    title: item.username,
-
-                }
-            })
+        getUsers(realmId).then((response) => {
+            const convertData = response
+                .filter((data: any) => data.id !== getMe().sub)
+                .map((item: any) => {
+                    return {
+                        key: item.id,
+                        title: item.username,
+                    }
+                })
             setDataSource(convertData)
         })
     }, [])

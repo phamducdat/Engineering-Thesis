@@ -50,18 +50,21 @@ public class UserClientService {
         return mapper.mapFromListEntitiesToUserClientDto(repository.findByIdRealmIdAndIdUserId(realmId, userId));
     }
 
-    public List<UserClientEntity> getUserClientsByClientId(
-            String realmId,
-            String clientId
-    ) {
-        return repository.findByIdRealmIdAndIdClientId(realmId, clientId);
-    }
-
-    public boolean checkUserClient(String realmId, String clientId, String userId) {
+    public boolean checkPermissionByDomainId(String realmId, String userId, String domainId) {
         UserClientId id = new UserClientId();
 
         id.setRealmId(realmId);
-        id.setClientId(keycloakService.getIdOfClientByRealmNameAndClientId(realmId, clientId));
+        id.setClientId(keycloakService.getIdOfClientByRealmNameAndClientId(realmId, domainId));
+        id.setUserId(userId);
+
+        return repository.findById(id).isPresent();
+    }
+
+    public boolean checkPermissionByUrl(String realmId, String userId, String url) {
+        UserClientId id = new UserClientId();
+
+        id.setRealmId(realmId);
+        id.setClientId(keycloakService.getIdOfClientByRealmNameAndUrl(realmId, url));
         id.setUserId(userId);
 
         return repository.findById(id).isPresent();

@@ -8,6 +8,7 @@ import DP_Tabs from "../../../../custom/data-display/tabs";
 import UserCredentials from "./UserCredentials";
 import {useRootContext} from "../../../root/context/useRootContext";
 import UserSession from "./UserSession";
+import {getMe} from "../../../../api/admin";
 import TabPane = Tabs.TabPane;
 
 export const Index: React.FC<{}> = props => {
@@ -45,9 +46,10 @@ export const Index: React.FC<{}> = props => {
                     <UserCredentials/>
                 </TabPane>
 
-                <TabPane key={"permissions"} tab={"Phân quyền"}>
-                    <PermissionTransfer/>
-                </TabPane>
+                {getMe().sub !== userId &&
+                    <TabPane key={"permissions"} tab={"Phân quyền"}>
+                        <PermissionTransfer/>
+                    </TabPane>}
 
                 <TabPane key={"session"} tab={"Phiên hoạt động"}>
                     <UserSession/>
