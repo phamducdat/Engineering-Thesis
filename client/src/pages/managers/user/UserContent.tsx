@@ -29,6 +29,17 @@ export const UserContent: React.FC<UserContentProps> = props => {
                 form={form}
             >
 
+                {props.mode === mode.Update && <Row>
+                    <Col span={8}>
+                        <Form.Item
+                            label="ID"
+                            name="id"
+                        >
+                            <Input disabled={props.mode === mode.Update}/>
+                        </Form.Item>
+                    </Col>
+                </Row>}
+
                 <Row>
                     <Col span={8}>
                         <Form.Item

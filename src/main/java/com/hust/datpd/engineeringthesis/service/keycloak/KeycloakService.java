@@ -131,7 +131,7 @@ public class KeycloakService {
                 keycloakInstanceFactory.getKeycloakInstance();
 
         RealmResource realmResource = keycloak.realm(realmName);
-
+//        System.out.println("dat with realmResource = " + realmResource);
         List<ClientRepresentation> clients = realmResource.clients().findAll();
 
         // Find the "admin-cli" client
