@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.UnknownHostException;
 
 @CrossOrigin("*")
 @RestController
@@ -26,7 +27,7 @@ public class RegistrationController {
     public ResponseEntity<RegistrationRes> registration(
             @Valid
             @RequestBody
-            RegistrationReq from) {
+            RegistrationReq from) throws UnknownHostException {
         RegistrationRes to = service.registration(from);
 //        RegistrationRes to = new RegistrationRes();
         return ResponseEntity.ok().body(to);

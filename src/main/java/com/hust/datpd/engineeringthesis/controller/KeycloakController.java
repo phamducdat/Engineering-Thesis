@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.UnknownHostException;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/external/v1/admin/keycloak")
@@ -93,7 +95,7 @@ public class KeycloakController {
     }
 
     @PostMapping("/realms")
-    public ResponseEntity<?> createRealm(@RequestBody RealmDto realmDto) {
+    public ResponseEntity<?> createRealm(@RequestBody RealmDto realmDto) throws UnknownHostException {
         keycloakService.createRealm(realmDto.getRealmName());
         return ResponseEntity.ok(null);
 

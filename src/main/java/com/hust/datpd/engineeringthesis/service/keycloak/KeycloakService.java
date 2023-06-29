@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 @Service
@@ -51,7 +53,7 @@ public class KeycloakService {
         return keycloak.realm(realmId);
     }
 
-    public void createRealm(String realmName) {
+    public void createRealm(String realmName) throws UnknownHostException {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -124,7 +126,7 @@ public class KeycloakService {
     }
 
 
-    public void addWebOriginToAdminCli(String realmName) {
+    public void addWebOriginToAdminCli(String realmName) throws UnknownHostException {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -145,27 +147,24 @@ public class KeycloakService {
                     adminCliClient.getWebOrigins() : new ArrayList<>();
 
             String address;
-            if (serverProperties.getAddress() != null) {
-                address = String.valueOf(serverProperties.getAddress());
-            } else {
-                address = "http://localhost";
-            }
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            address = inetAddress.getHostAddress();
             int port = serverProperties.getPort();
-            String url = address + ":" + port;
+            String url = "http://" + address + ":" + port;
             // Add the new WebOrigin
 
 
             if (frontendUrl != null && webOrigins.stream().noneMatch(element -> {
                 return Objects.equals(element, frontendUrl);
             })) {
-                LOGGER.info("Add frontendURL like web origin in master realm");
+                LOGGER.info("Add frontendURL like web origin in master realm: " + frontendUrl);
                 webOrigins.add(frontendUrl);
             }
 
             if (webOrigins.stream().noneMatch(element -> {
                 return Objects.equals(url, element);
             })) {
-                LOGGER.info("Add backendURL like web origin in master realm");
+                LOGGER.info("Add backendURL like web origin in master realm: " + url);
                 webOrigins.add(url);
             }
 

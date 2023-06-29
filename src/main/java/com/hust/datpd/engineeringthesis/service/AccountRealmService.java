@@ -10,6 +10,7 @@ import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 @Service
@@ -44,7 +45,7 @@ public class AccountRealmService {
         return to;
     }
 
-    public RegistrationRes registration(RegistrationReq from) {
+    public RegistrationRes registration(RegistrationReq from) throws UnknownHostException {
         String userName = from.getEmail();
         String realm = UUID.randomUUID().toString();
         keycloakService.createRealm(realm);
