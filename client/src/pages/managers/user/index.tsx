@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {deleteUser, getUsers} from "../../../api/user";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {Button, Tabs} from "antd";
+import {Button, Tabs, Tag} from "antd";
 import {useRootContext} from "../../root/context/useRootContext";
 import DP_Tabs from "../../../custom/data-display/tabs";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
@@ -71,6 +71,21 @@ export const User: React.FC = () => {
             title: "Tên",
             dataIndex: "lastName",
             key: "lastName"
+        },
+        {
+            title: "Trạng thái",
+            dataIndex: "enabled",
+            key: "enabled",
+            render: (text: boolean, record: any) => {
+                if (text)
+                    return <Tag color={"green"}>
+                        Hoạt động
+                    </Tag>
+                else
+                    return <Tag>
+                        Không hoạt động
+                    </Tag>
+            }
         },
         {
             title: "",
