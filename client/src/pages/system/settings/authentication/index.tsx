@@ -9,7 +9,8 @@ import {
 } from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {DP_Table} from "../../../../custom/data-display/table";
-import {Checkbox, Col, Row, Select} from "antd";
+import {Button, Checkbox, Col, Row, Select, Space} from "antd";
+import {DownOutlined, UpOutlined} from "@ant-design/icons";
 
 const requirementOptions = [
     {
@@ -46,16 +47,19 @@ const Authentication: React.FC = () => {
         }).catch((error) => {
             if (error?.response?.status === 404) {
                 setNoDCX509Installed(true)
-                setDataSource([
-                    {
-                        displayName: "browser forms",
-                        requirement: "REQUIRED"
-                    },
-                    {
-                        displayName: "X509/Validate Username Form",
-                        requirement: "DISABLE"
-                    }
-                ])
+                getExecutionsByFlowAlias("browser").then((response) => {
+                    const data = response?.filter((element: any) =>
+                        element.displayName === "forms"
+                    )
+                    setDataSource([
+                        ...data,
+                        {
+                            displayName: "X509/Validate Username Form",
+                            requirement: "DISABLE"
+                        }
+                    ])
+
+                })
             }
         })
 
@@ -67,7 +71,23 @@ const Authentication: React.FC = () => {
             title: "",
             dataIndex: "index",
             key: "index",
-            width: "5%"
+            width: "7%",
+            render: (text: string, record: any, index: number) => {
+                return <Space>
+                    <Button type={"text"} icon={<UpOutlined/>}
+                            disabled={index === 0
+                                || record.requirement === 'DISABLE'
+
+                            }
+                    />
+                    <Button type={"text"} icon={<DownOutlined/>}
+                            disabled={index === 1
+                                || record.requirement === 'DISABLE'
+                                || noDCX509Installed
+                            }
+                    />
+                </Space>
+            }
         },
         {
             title: "Loại xác thực",
@@ -101,6 +121,8 @@ const Authentication: React.FC = () => {
                                     }
                                 ]}
                                 style={{width: "100%"}}
+                                disabled={noDCX509Installed}
+                                defaultValue={"email"}
                             />
                         </Col>
                     </Row>
@@ -110,14 +132,27 @@ const Authentication: React.FC = () => {
             title: "Trạng thái",
             dataIndex: "requirement",
             key: "requirement",
-            render: (text: string, record: any) => {
-                return <CheckboxGroup
-                    options={requirementOptions}
-                    value={[text]}
-                />
-            }
+            render: (text: string, record: any) => convertRequirement(text, record)
         }
     ]
+
+    const convertRequirement = (text: string, record: any) => {
+        if (record.displayName === "X509/Validate Username Form") {
+            return <CheckboxGroup
+                options={requirementOptions}
+                value={[text]}
+            />
+        } else {
+            return <CheckboxGroup
+                options={[{
+                    value: 'REQUIRED',
+                    label: 'Bắt buộc',
+                },]}
+                value={[text]}
+            />
+        }
+
+    }
 
 
     const createDigitalCertificate = () => {
