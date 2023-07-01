@@ -1,4 +1,4 @@
-import DP_axios, {CustomAxiosRequestConfig} from "../../custom/axios";
+import DP_axios, {CustomAxiosRequestConfig} from "../../../custom/axios";
 
 export const copyBrowserAuthentication = async (newName: string) => {
     const response = await DP_axios.post("/admin/realms/master/authentication/flows/browser/copy", {
@@ -34,7 +34,7 @@ export const getExecutionById = async (executionId: string) => {
     return response.data || []
 }
 
-export const configAuthentication = async (executionId: string) => {
+export const configAuthentication = async (executionId: string, configAlias: string) => {
     const config: CustomAxiosRequestConfig = {captureLocationHeader: true}
     const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/config`,
         {
@@ -54,7 +54,7 @@ export const configAuthentication = async (executionId: string) => {
                 "x509-cert-auth.confirmation-page-disallowed": "",
                 "x509-cert-auth.revalidate-certificate-enabled": "",
                 "x509-cert-auth.certificate-policy-mode": "All"
-            }, "alias": "x509 config"
+            }, "alias": configAlias
         }, config)
     return response.data || []
 }

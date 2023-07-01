@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Button} from "antd";
 import {
     addExecution,
@@ -6,13 +6,14 @@ import {
     copyBrowserAuthentication,
     raisePriorityExecution,
     updateExecutionById
-} from "../../../../api/system";
+} from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 
 
 const Authentication: React.FC = () => {
 
-    const [alias, setAlias] = useState(makeid())
+    const alias = "DCX509"
+    const configAlias = "CDCX509"
 
 
     const createDigitalCertificate = () => {
@@ -22,7 +23,7 @@ const Authentication: React.FC = () => {
                 const executionId = location.substring(location.lastIndexOf('/') + 1)
 
 
-                configAuthentication(executionId).then((response) => {
+                configAuthentication(executionId, configAlias).then((response) => {
                     const location = response.location
                     const configId = location.substring(location.lastIndexOf('/') + 1)
 
@@ -44,18 +45,6 @@ const Authentication: React.FC = () => {
                 })
             })
         })
-    }
-
-    function makeid() {
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        let counter = 0;
-        while (counter < 10) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            counter += 1;
-        }
-        return result;
     }
 
     return (
