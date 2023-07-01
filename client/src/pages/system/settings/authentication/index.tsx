@@ -9,8 +9,7 @@ import {
 } from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {DP_Table} from "../../../../custom/data-display/table";
-import {Checkbox} from "antd";
-
+import {Checkbox, Col, Row, Select} from "antd";
 
 const requirementOptions = [
     {
@@ -26,6 +25,7 @@ const requirementOptions = [
         label: 'Không hoạt động',
     },
 ]
+
 
 const CheckboxGroup = Checkbox.Group;
 const Authentication: React.FC = () => {
@@ -64,14 +64,46 @@ const Authentication: React.FC = () => {
 
     const columns = [
         {
+            title: "",
+            dataIndex: "index",
+            key: "index",
+            width: "5%"
+        },
+        {
             title: "Loại xác thực",
             dataIndex: "displayName",
             key: "displayName",
             render: (text: string, record: any) => {
-                if (text === "X509/Validate Username Form")
+                if (text === "X509/Validate Username Form") {
                     return "Chứng chỉ số"
-                else
+
+                } else
                     return "Tài khoản, mật khẩu"
+            }
+        },
+        {
+            title: "",
+            dataIndex: "digitalCertificateType",
+            key: "digitalCertificateType",
+            render: (text: string, record: any) => {
+                if (record?.displayName == "X509/Validate Username Form")
+                    return <Row>
+                        <Col span="12">
+                            <Select
+                                options={[
+                                    {
+                                        label: "Email",
+                                        value: "email"
+                                    },
+                                    {
+                                        label: "Tên tài khoản",
+                                        value: "username"
+                                    }
+                                ]}
+                                style={{width: "100%"}}
+                            />
+                        </Col>
+                    </Row>
             }
         },
         {
@@ -79,7 +111,10 @@ const Authentication: React.FC = () => {
             dataIndex: "requirement",
             key: "requirement",
             render: (text: string, record: any) => {
-                return <CheckboxGroup options={requirementOptions} value={[text]}/>
+                return <CheckboxGroup
+                    options={requirementOptions}
+                    value={[text]}
+                />
             }
         }
     ]
@@ -121,6 +156,7 @@ const Authentication: React.FC = () => {
             {/*<Button onClick={createDigitalCertificate}>*/}
             {/*    Xác thực bằng chứng chỉ số*/}
             {/*</Button>*/}
+
 
             <DP_Table
                 columns={columns}
