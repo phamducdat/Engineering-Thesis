@@ -10,7 +10,7 @@ const Settings: React.FC = () => {
   return (
     <div>
       <DP_Tabs>
-          <TabPane tab={"Tokens"} tabKey={"tokens"}>
+          <TabPane tab={"Token"} tabKey={"token"}>
               <Token/>
           </TabPane>
       </DP_Tabs>
