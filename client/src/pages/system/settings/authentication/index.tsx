@@ -15,15 +15,12 @@ const Authentication: React.FC = () => {
     const [alias, setAlias] = useState(makeid())
 
 
-    const onClick = () => {
+    const createDigitalCertificate = () => {
         copyBrowserAuthentication(alias).then(() => {
             addExecution(alias).then((response) => {
                 const location = response.location
                 const executionId = location.substring(location.lastIndexOf('/') + 1)
 
-                raisePriorityExecution(executionId).then((response) => {
-
-                })
 
                 configAuthentication(executionId).then((response) => {
                     const location = response.location
@@ -32,7 +29,9 @@ const Authentication: React.FC = () => {
                 })
 
                 updateExecutionById(alias, executionId).then(() => {
+                    raisePriorityExecution(executionId).then((response) => {
 
+                    })
                 })
 
                 getRealmInfoByRealmId("master").then((response) => {
@@ -61,7 +60,7 @@ const Authentication: React.FC = () => {
 
     return (
         <div>
-            <Button onClick={onClick}>
+            <Button onClick={createDigitalCertificate}>
                 Xác thực bằng chứng chỉ số
             </Button>
         </div>
