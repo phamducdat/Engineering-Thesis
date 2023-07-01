@@ -27,7 +27,7 @@ export const items: ItemType[] = [
     },
     {
         key: "system",
-        label: "Hệ thống",
+        label: "Cài đặt",
         type: 'group',
         children: [
             {

@@ -7,6 +7,13 @@ export const copyBrowserAuthentication = async (newName: string) => {
     return response.data || []
 }
 
+export const getExecutionsByFlowAlias = async (flowAlias: string) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: true}
+
+    const response = await DP_axios.get(`/admin/realms/master/authentication/flows/${flowAlias}/executions`, config)
+    return response.data || []
+}
+
 
 export const addExecution = async (newName: string) => {
     const config: CustomAxiosRequestConfig = {captureLocationHeader: true}
@@ -59,7 +66,7 @@ export const configAuthentication = async (executionId: string, configAlias: str
     return response.data || []
 }
 
-export const updateExecutionById = async (flowName:string, executionId: string) => {
+export const updateExecutionById = async (flowName: string, executionId: string) => {
     const response = await DP_axios.put(`/admin/realms/master/authentication/flows/${flowName}/executions`, {
         index: 3,
         id: executionId,

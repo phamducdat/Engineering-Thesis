@@ -101,6 +101,7 @@ DP_axios.interceptors.response.use(
     },
     async (error) => {
         const originalRequest = error.config;
+        const config = error?.config as CustomAxiosRequestConfig;
 
         if (error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
@@ -110,13 +111,17 @@ DP_axios.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 return DP_axios(originalRequest);
             } catch (e) {
-
+                // Make sure to throw this error so it gets handled upstream
+                throw e;
             }
         } else {
+            if (config.disableMessage == undefined || !config.disableMessage)
 
-            message.warning(error.response?.data.errorMessage)
+                message.warning(error.response?.data.errorMessage)
         }
-        return Promise.reject(error);
+
+        // Unhandled error, throw it to make sure it gets caught somewhere
+        throw error;
     }
 )
 export default DP_axios
