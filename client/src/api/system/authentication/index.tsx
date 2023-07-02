@@ -25,14 +25,26 @@ export const addExecution = async (newName: string) => {
 
 
 export const raisePriorityExecution = async (executionId: string) => {
+    const config: CustomAxiosRequestConfig = {
+        customMessage: {
+            type: "success",
+            message: "Cập nhật thành công"
+        }
+    }
     const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/raise-priority`,
-        {"realm": "master", "execution": executionId})
+        {"realm": "master", "execution": executionId}, config)
     return response.data || []
 }
 
 export const lowerPriorityExecution = async (executionId: string) => {
+    const config: CustomAxiosRequestConfig = {
+        customMessage: {
+            type: "success",
+            message: "Cập nhật thành công"
+        }
+    }
     const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/lower-priority`,
-        {"realm": "master", "execution": executionId})
+        {"realm": "master", "execution": executionId}, config)
     return response.data || []
 }
 

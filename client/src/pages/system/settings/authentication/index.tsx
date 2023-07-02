@@ -4,6 +4,8 @@ import {
     configAuthentication,
     copyBrowserAuthentication,
     getExecutionsByFlowAlias,
+    lowerPriorityExecution,
+    raisePriorityExecution,
     updateExecutionById
 } from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
@@ -68,12 +70,24 @@ const Authentication: React.FC = () => {
                                 || record.requirement === 'DISABLE'
 
                             }
+                            onClick={() => {
+                                raisePriorityExecution(record?.id).then(() => {
+                                    getData()
+                                })
+                            }
+                            }
                     />
-                    <Button type={"text"} icon={<DownOutlined/>}
+                    <Button type={"text"}
+                            icon={<DownOutlined/>}
                             disabled={index === 1
                                 || record.requirement === 'DISABLE'
                                 || noDCX509Installed
                             }
+                            onClick={() => {
+                                lowerPriorityExecution(record?.id).then(() => {
+                                    getData()
+                                })
+                            }}
                     />
                 </Space>
             }
@@ -170,13 +184,27 @@ const Authentication: React.FC = () => {
                 </Checkbox>
             </Space>
         } else {
-            // return <CheckboxGroup
-            //     options={[{
-            //         value: 'REQUIRED',
-            //         label: 'Bắt buộc',
-            //     },]}
-            //     value={[text]}
-            // />
+            return <Space>
+                <Checkbox
+                    checked={text === 'REQUIRED'}
+                    onChange={(e: CheckboxChangeEvent) => {
+                        if (text !== 'REQUIRED') {
+                        }
+
+                    }}
+                >
+                    Bắt buộc
+                </Checkbox>
+                <Checkbox
+                    checked={text === 'ALTERNATIVE'}
+                    onChange={(e: CheckboxChangeEvent) => {
+                        if (text !== 'ALTERNATIVE') {
+                        }
+                    }}
+                >
+                    Có thể thay thế
+                </Checkbox>
+            </Space>
         }
 
     }
