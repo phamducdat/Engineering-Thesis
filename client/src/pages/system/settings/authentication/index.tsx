@@ -4,31 +4,15 @@ import {
     configAuthentication,
     copyBrowserAuthentication,
     getExecutionsByFlowAlias,
-    raisePriorityExecution,
     updateExecutionById
 } from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {DP_Table} from "../../../../custom/data-display/table";
-import {Button, Checkbox, Col, Row, Select, Space} from "antd";
+import {Button, Checkbox, Col, message, Row, Select, Space} from "antd";
 import {DownOutlined, UpOutlined} from "@ant-design/icons";
-
-const requirementOptions = [
-    {
-        value: 'REQUIRED',
-        label: 'Bắt buộc',
-    },
-    {
-        value: 'ALTERNATIVE',
-        label: 'Có thể thay thế',
-    },
-    {
-        value: 'DISABLE',
-        label: 'Không hoạt động',
-    },
-]
+import {CheckboxChangeEvent} from "antd/es/checkbox";
 
 
-const CheckboxGroup = Checkbox.Group;
 const Authentication: React.FC = () => {
 
     const alias = "DCX509"
@@ -38,12 +22,13 @@ const Authentication: React.FC = () => {
     const [noDCX509Installed, setNoDCX509Installed] = useState(false)
 
 
-    useEffect(() => {
+    function getData() {
         getExecutionsByFlowAlias(alias).then((response) => {
             setDataSource(response?.filter((element: any) =>
-                element.displayName === "X509/Validate Usewrname Form"
+                element.displayName === "X509/Validate Username Form"
                 || element.displayName === "DCX509 forms"
             ))
+            setNoDCX509Installed(false)
         }).catch((error) => {
             if (error?.response?.status === 404) {
                 setNoDCX509Installed(true)
@@ -62,7 +47,11 @@ const Authentication: React.FC = () => {
                 })
             }
         })
+    }
 
+
+    useEffect(() => {
+        getData();
     }, [])
 
 
@@ -136,59 +125,94 @@ const Authentication: React.FC = () => {
         }
     ]
 
+
     const convertRequirement = (text: string, record: any) => {
         if (record.displayName === "X509/Validate Username Form") {
-            return <CheckboxGroup
-                options={requirementOptions}
-                value={[text]}
-            />
+            return <Space>
+                <Checkbox
+                    checked={text === 'REQUIRED'}
+                    onChange={(e: CheckboxChangeEvent) => {
+                        if (text !== 'REQUIRED') {
+                            if (noDCX509Installed) {
+                                createDigitalCertificate('REQUIRED').then(() => {
+                                    getData()
+                                })
+                            }
+                        }
+
+                    }}
+                >
+                    Bắt buộc
+                </Checkbox>
+                <Checkbox
+                    checked={text === 'ALTERNATIVE'}
+                    onChange={(e: CheckboxChangeEvent) => {
+                        if (text !== 'ALTERNATIVE') {
+                            if (noDCX509Installed) {
+                                createDigitalCertificate('ALTERNATIVE').then(() => {
+                                    getData()
+                                })
+                            }
+                        }
+                    }}
+                >
+                    Có thể thay thế
+                </Checkbox>
+                <Checkbox
+                    checked={text === 'DISABLE'}
+                    onChange={(e: CheckboxChangeEvent) => {
+                        if (text !== 'DISABLE') {
+
+                        }
+                    }}
+                >
+                    Không hoạt động
+                </Checkbox>
+            </Space>
         } else {
-            return <CheckboxGroup
-                options={[{
-                    value: 'REQUIRED',
-                    label: 'Bắt buộc',
-                },]}
-                value={[text]}
-            />
+            // return <CheckboxGroup
+            //     options={[{
+            //         value: 'REQUIRED',
+            //         label: 'Bắt buộc',
+            //     },]}
+            //     value={[text]}
+            // />
         }
 
     }
 
 
-    const createDigitalCertificate = () => {
-        copyBrowserAuthentication(alias).then(() => {
-            addExecution(alias).then((response) => {
-                const location = response.location
-                const executionId = location.substring(location.lastIndexOf('/') + 1)
+    const createDigitalCertificate = async (requirement: string) => {
+        try {
+            await copyBrowserAuthentication(alias);
+            const addExecutionResponse = await addExecution(alias);
+            const location = addExecutionResponse.location;
+            const executionId = location.substring(location.lastIndexOf('/') + 1);
 
+            const configResponse = await configAuthentication(executionId, configAlias);
+            const configLocation = configResponse.location;
+            const configId = configLocation.substring(configLocation.lastIndexOf('/') + 1);
 
-                configAuthentication(executionId, configAlias).then((response) => {
-                    const location = response.location
-                    const configId = location.substring(location.lastIndexOf('/') + 1)
+            const realmInfo = await getRealmInfoByRealmId("master");
 
-                })
-
-                updateExecutionById(alias, executionId).then(() => {
-                    raisePriorityExecution(executionId).then((response) => {
-
-                    })
-                })
-
-                getRealmInfoByRealmId("master").then((response) => {
-                    updateRealmByRealmId("master", {
-                        ...response,
-                        browserFlow: alias
-                    }).then(r => {
-
-                    })
-                })
-            })
-        })
+            await Promise.all([
+                updateExecutionById(alias, executionId, requirement, true),
+                // raisePriorityExecution(executionId),
+                updateRealmByRealmId("master", {
+                    ...realmInfo,
+                    browserFlow: alias
+                }, true)
+            ]);
+            message.success("Cập nhật thành công")
+        } catch (error) {
+            console.error(error);
+        }
     }
+
 
     return (
         <div>
-            {/*<Button onClick={createDigitalCertificate}>*/}
+            {/*<Button onClick={() => createDigitalCertificate('ALTERNATIVE')}>*/}
             {/*    Xác thực bằng chứng chỉ số*/}
             {/*</Button>*/}
 

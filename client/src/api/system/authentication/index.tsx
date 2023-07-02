@@ -1,22 +1,22 @@
 import DP_axios, {CustomAxiosRequestConfig} from "../../../custom/axios";
 
 export const copyBrowserAuthentication = async (newName: string) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: true}
     const response = await DP_axios.post("/admin/realms/master/authentication/flows/browser/copy", {
         newName: newName
-    })
+    }, config)
     return response.data || []
 }
 
 export const getExecutionsByFlowAlias = async (flowAlias: string) => {
     const config: CustomAxiosRequestConfig = {disableMessage: true}
-
     const response = await DP_axios.get(`/admin/realms/master/authentication/flows/${flowAlias}/executions`, config)
     return response.data || []
 }
 
 
 export const addExecution = async (newName: string) => {
-    const config: CustomAxiosRequestConfig = {captureLocationHeader: true}
+    const config: CustomAxiosRequestConfig = {captureLocationHeader: true, disableMessage: true}
     const response = await DP_axios.post(`/admin/realms/master/authentication/flows/${newName}/executions/execution`, {
         provider: "auth-x509-client-username-form"
     }, config)
@@ -42,7 +42,7 @@ export const getExecutionById = async (executionId: string) => {
 }
 
 export const configAuthentication = async (executionId: string, configAlias: string) => {
-    const config: CustomAxiosRequestConfig = {captureLocationHeader: true}
+    const config: CustomAxiosRequestConfig = {captureLocationHeader: true, disableMessage: true}
     const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/config`,
         {
             "config": {
@@ -66,11 +66,15 @@ export const configAuthentication = async (executionId: string, configAlias: str
     return response.data || []
 }
 
-export const updateExecutionById = async (flowName: string, executionId: string) => {
+export const updateExecutionById = async (flowName: string,
+                                          executionId: string,
+                                          requirement: string,
+                                          disableMessage: boolean = false
+) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: disableMessage}
     const response = await DP_axios.put(`/admin/realms/master/authentication/flows/${flowName}/executions`, {
-        index: 3,
         id: executionId,
-        requirement: "ALTERNATIVE"
-    })
+        requirement: requirement
+    }, config)
     return response.data || []
 }

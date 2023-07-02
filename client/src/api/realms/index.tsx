@@ -1,4 +1,4 @@
-import DP_axios from "../../custom/axios";
+import DP_axios, {CustomAxiosRequestConfig} from "../../custom/axios";
 
 export const getAllRealms = async () => {
     const response = await DP_axios.get("admin/realms")
@@ -11,8 +11,11 @@ export const getRealmInfoByRealmId = async (realmId: string | undefined) => {
     return response.data
 }
 
-export const updateRealmByRealmId = async (realmId: string | undefined, data: object) => {
-    const response = await DP_axios.put(`/admin/realms/${realmId}`, data)
+export const updateRealmByRealmId = async (realmId: string | undefined,
+                                           data: object,
+                                           disableMessage: boolean = false) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: disableMessage}
+    const response = await DP_axios.put(`/admin/realms/${realmId}`, data, config)
     return response.data
 }
 
