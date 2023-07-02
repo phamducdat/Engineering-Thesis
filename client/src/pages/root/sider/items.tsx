@@ -31,18 +31,18 @@ export const items: ItemType[] = [
         type: 'group',
         children: [
             {
-                key: "sessions",
-                icon: <SettingOutlined/>,
-                label: <Link to={"system/sessions"}>
-                    Phiên hoạt động
+                key: "settings",
+                icon: <GlobalOutlined/>,
+                label: <Link to={"system/settings"}>
+                    Hệ thống
                 </Link>
 
             },
             {
-                key: "settings",
-                icon: <GlobalOutlined />,
-                label: <Link to={"system/settings"}>
-                    Hệ thống
+                key: "sessions",
+                icon: <SettingOutlined/>,
+                label: <Link to={"system/sessions"}>
+                    Phiên hoạt động
                 </Link>
 
             }

@@ -231,6 +231,9 @@ const Authentication: React.FC = () => {
                     checked={text === 'REQUIRED'}
                     onChange={(e: CheckboxChangeEvent) => {
                         if (text !== 'REQUIRED') {
+                            updateExecutionById(alias, record.id, 'REQUIRED', false).then(() => {
+                                getData()
+                            })
                         }
 
                     }}
@@ -241,6 +244,9 @@ const Authentication: React.FC = () => {
                     checked={text === 'ALTERNATIVE'}
                     onChange={(e: CheckboxChangeEvent) => {
                         if (text !== 'ALTERNATIVE') {
+                            updateExecutionById(alias, record.id, 'ALTERNATIVE', false).then(() => {
+                                getData()
+                            })
                         }
                     }}
                 >
@@ -250,6 +256,9 @@ const Authentication: React.FC = () => {
                     checked={text === 'DISABLED'}
                     onChange={(e: CheckboxChangeEvent) => {
                         if (text !== 'DISABLED') {
+                            updateExecutionById(alias, record.id, 'DISABLED', false).then(() => {
+                                getData()
+                            })
                         }
                     }}
                 >
