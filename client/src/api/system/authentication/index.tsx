@@ -53,7 +53,14 @@ export const getExecutionById = async (executionId: string) => {
     return response.data || []
 }
 
-export const configAuthentication = async (executionId: string, configAlias: string) => {
+export const getConfigAuthenticationById = async (authenticationId: string) => {
+    const response = await DP_axios.get(`/admin/realms/master/authentication/config/${authenticationId}`)
+    return response.data || []
+
+}
+
+export const createConfigAuthentication = async (executionId: string,
+                                                 configAlias: string) => {
     const config: CustomAxiosRequestConfig = {captureLocationHeader: true, disableMessage: true}
     const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/config`,
         {
@@ -75,6 +82,13 @@ export const configAuthentication = async (executionId: string, configAlias: str
                 "x509-cert-auth.certificate-policy-mode": "All"
             }, "alias": configAlias
         }, config)
+    return response.data || []
+}
+
+export const updateConfigAuthentication = async (configId: string,
+                                                 data:any) => {
+    const response = await DP_axios.put(`/admin/realms/master/authentication/config/${configId}`,
+        data)
     return response.data || []
 }
 

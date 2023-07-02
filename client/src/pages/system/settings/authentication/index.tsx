@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     addExecution,
-    configAuthentication,
     copyBrowserAuthentication,
+    createConfigAuthentication,
+    getConfigAuthenticationById,
     getExecutionsByFlowAlias,
     lowerPriorityExecution,
     raisePriorityExecution,
+    updateConfigAuthentication,
     updateExecutionById
 } from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
@@ -22,15 +24,26 @@ const Authentication: React.FC = () => {
 
     const [dataSource, setDataSource] = useState<any []>([]);
     const [noDCX509Installed, setNoDCX509Installed] = useState(false)
+    const [configAuthData, setConfigAuthData] = useState<any>()
+    const [flag, setFlag] = useState(false)
 
 
     function getData() {
+        setFlag(false)
         getExecutionsByFlowAlias(alias).then((response) => {
+            setNoDCX509Installed(false)
             setDataSource(response?.filter((element: any) =>
                 element.displayName === "X509/Validate Username Form"
                 || element.displayName === "DCX509 forms"
             ))
-            setNoDCX509Installed(false)
+            response.forEach((element: any) => {
+                if (element.displayName === "X509/Validate Username Form") {
+                    getConfigAuthenticationById(element.authenticationConfig).then((response) => {
+                        setConfigAuthData(response)
+                        setFlag(true)
+                    })
+                }
+            })
         }).catch((error) => {
             if (error?.response?.status === 404) {
                 setNoDCX509Installed(true)
@@ -42,9 +55,10 @@ const Authentication: React.FC = () => {
                         ...data,
                         {
                             displayName: "X509/Validate Username Form",
-                            requirement: "DISABLE"
+                            requirement: "DISABLED"
                         }
                     ])
+                    setFlag(true)
 
                 })
             }
@@ -52,7 +66,7 @@ const Authentication: React.FC = () => {
     }
 
 
-    useEffect(() => {
+    useMemo(() => {
         getData();
     }, [])
 
@@ -67,7 +81,7 @@ const Authentication: React.FC = () => {
                 return <Space>
                     <Button type={"text"} icon={<UpOutlined/>}
                             disabled={index === 0
-                                || record.requirement === 'DISABLE'
+                                || record.requirement === 'DISABLED'
 
                             }
                             onClick={() => {
@@ -80,7 +94,7 @@ const Authentication: React.FC = () => {
                     <Button type={"text"}
                             icon={<DownOutlined/>}
                             disabled={index === 1
-                                || record.requirement === 'DISABLE'
+                                || record.requirement === 'DISABLED'
                                 || noDCX509Installed
                             }
                             onClick={() => {
@@ -109,26 +123,44 @@ const Authentication: React.FC = () => {
             dataIndex: "digitalCertificateType",
             key: "digitalCertificateType",
             render: (text: string, record: any) => {
-                if (record?.displayName == "X509/Validate Username Form")
+                if (record?.displayName == "X509/Validate Username Form") {
+                    let defaultValue = "Subject's e-mail"
+                    let onChange;
+                    if (configAuthData?.config) {
+                        defaultValue = configAuthData?.config['x509-cert-auth.mapping-source-selection'].toString()
+                        onChange = (value: string) => {
+                            updateConfigAuthentication(record?.authenticationConfig, {
+                                ...configAuthData,
+                                config: {
+                                    ...configAuthData.config,
+                                    "x509-cert-auth.mapping-source-selection": value
+                                }
+                            }).then(() => {
+                                // getData()
+                            })
+                        }
+                    }
                     return <Row>
-                        <Col span="12">
+                        <Col span="18">
                             <Select
                                 options={[
                                     {
-                                        label: "Email",
-                                        value: "email"
+                                        label: "Email (EMAILADDRESS)",
+                                        value: "Subject's e-mail"
                                     },
                                     {
-                                        label: "Tên tài khoản",
-                                        value: "username"
+                                        label: "Tên tài khoản (CN)",
+                                        value: "Subject's Common Name"
                                     }
                                 ]}
                                 style={{width: "100%"}}
-                                disabled={noDCX509Installed}
-                                defaultValue={"email"}
+                                disabled={noDCX509Installed || record.requirement === 'DISABLED'}
+                                defaultValue={defaultValue}
+                                onChange={onChange}
                             />
                         </Col>
                     </Row>
+                }
             }
         },
         {
@@ -151,6 +183,10 @@ const Authentication: React.FC = () => {
                                 createDigitalCertificate('REQUIRED').then(() => {
                                     getData()
                                 })
+                            } else {
+                                updateExecutionById(alias, record.id, 'REQUIRED', false).then(() => {
+                                    getData()
+                                })
                             }
                         }
 
@@ -166,6 +202,10 @@ const Authentication: React.FC = () => {
                                 createDigitalCertificate('ALTERNATIVE').then(() => {
                                     getData()
                                 })
+                            } else {
+                                updateExecutionById(alias, record.id, 'ALTERNATIVE', false).then(() => {
+                                    getData()
+                                })
                             }
                         }
                     }}
@@ -173,10 +213,12 @@ const Authentication: React.FC = () => {
                     Có thể thay thế
                 </Checkbox>
                 <Checkbox
-                    checked={text === 'DISABLE'}
+                    checked={text === 'DISABLED'}
                     onChange={(e: CheckboxChangeEvent) => {
-                        if (text !== 'DISABLE') {
-
+                        if (text !== 'DISABLED') {
+                            updateExecutionById(alias, record.id, 'DISABLED', false).then(() => {
+                                getData()
+                            })
                         }
                     }}
                 >
@@ -204,6 +246,15 @@ const Authentication: React.FC = () => {
                 >
                     Có thể thay thế
                 </Checkbox>
+                <Checkbox
+                    checked={text === 'DISABLED'}
+                    onChange={(e: CheckboxChangeEvent) => {
+                        if (text !== 'DISABLED') {
+                        }
+                    }}
+                >
+                    không hoạt động
+                </Checkbox>
             </Space>
         }
 
@@ -217,7 +268,7 @@ const Authentication: React.FC = () => {
             const location = addExecutionResponse.location;
             const executionId = location.substring(location.lastIndexOf('/') + 1);
 
-            const configResponse = await configAuthentication(executionId, configAlias);
+            const configResponse = await createConfigAuthentication(executionId, configAlias);
             const configLocation = configResponse.location;
             const configId = configLocation.substring(configLocation.lastIndexOf('/') + 1);
 
@@ -240,15 +291,11 @@ const Authentication: React.FC = () => {
 
     return (
         <div>
-            {/*<Button onClick={() => createDigitalCertificate('ALTERNATIVE')}>*/}
-            {/*    Xác thực bằng chứng chỉ số*/}
-            {/*</Button>*/}
-
-
-            <DP_Table
+            {flag && <DP_Table
                 columns={columns}
                 dataSource={dataSource}
-            />
+                pagination={false}
+            />}
         </div>
     );
 };
