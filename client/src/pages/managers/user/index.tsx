@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {deleteUser, getUsers} from "../../../api/user";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {Button, Tabs, Tag} from "antd";
 import {useRootContext} from "../../root/context/useRootContext";
 import DP_Tabs from "../../../custom/data-display/tabs";
@@ -12,27 +12,35 @@ import TabPane = Tabs.TabPane;
 export const User: React.FC = () => {
     const {realmId} = useParams()
     const [dataSource, setDataSource] = useState()
-    const [userIdResting, setUserIdResting] = useState<string>()
     const {setSpinning, reloadData, setReloadData, setTitle} = useRootContext()
+    const [searchParams] = useSearchParams()
+
     let navigate = useNavigate()
 
-    function initData() {
+    function getData() {
         setSpinning(true)
-        getUsers(realmId).then(response => {
+        const search = searchParams.get('search')
+        getUsers(realmId, {
+            search: search
+        }).then(response => {
             setDataSource(response)
             setSpinning(false)
         })
     }
 
     useEffect(() => {
-        initData();
+        getData();
         setTitle("Tài khoản")
     }, [])
+
+    useEffect(() => {
+        getData()
+    }, [searchParams])
 
 
     useEffect(() => {
         if (reloadData == "user") {
-            initData()
+            getData()
             setReloadData(null)
         }
 

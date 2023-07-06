@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {deleteClient, getAllClients} from "../../../api/clients";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {Button, Tabs} from "antd";
 import {DP_Table} from "../../../custom/data-display/table";
 import {useRootContext} from "../../root/context/useRootContext";
@@ -8,7 +8,6 @@ import DP_Tabs from "../../../custom/data-display/tabs";
 import {filterClient} from "../../../custom/filter-client";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
 import TabPane = Tabs.TabPane;
-import Table from "@datpd/packages"
 
 export const Domain: React.FC = () => {
 
@@ -16,15 +15,24 @@ export const Domain: React.FC = () => {
     const [dataSource, setDataSource] = useState()
     const [openCreateModal, setOpenCreateModal] = useState(false)
     const {setTitle, reloadData, setReloadData} = useRootContext()
+    const [searchParams] = useSearchParams()
     let navigate = useNavigate()
 
 
     function initData() {
-        getAllClients(realmId).then((response) => {
+        const search = searchParams.get('search')
+        getAllClients(realmId, {
+            clientId: search,
+            search: true
+        }).then((response) => {
             setDataSource(filterClient(response))
 
         })
     }
+
+    useEffect(() => {
+        initData()
+    }, [searchParams])
 
     useEffect(() => {
         setReloadData(null)
