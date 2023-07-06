@@ -58,14 +58,14 @@ public class UserClientController {
 
     @PostMapping("/check-permission/url")
     public ResponseEntity<?> checkPermissionByUrl(@RequestBody PermissionRequestUrl from,
-                                                  @PathVariable String realmId,
-                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+                                                  @PathVariable String realmId
+//                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-        if (!validatorUtil.validToken(authHeader))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new ErrorResponse("Tài khoản không hợp lệ")
-            );
+//        if (!validatorUtil.validToken(authHeader))
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+//                    new ErrorResponse("Tài khoản không hợp lệ")
+//            );
         boolean hasPermission = service.checkPermissionByUrl(realmId, from.getUserId(), from.getUrl());
         return ResponseEntity.ok(hasPermission);
     }
@@ -73,13 +73,13 @@ public class UserClientController {
 
     @PostMapping("/check-permission/domain")
     public ResponseEntity<?> checkPermissionByDomainId(@RequestBody PermissionRequestDomainId from,
-                                                       @PathVariable String realmId,
-                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+                                                       @PathVariable String realmId
+//                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
-        if (!validatorUtil.validToken(authHeader))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new ErrorResponse("Tài khoản không hợp lệ")
-            );
+//        if (!validatorUtil.validToken(authHeader))
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+//                    new ErrorResponse("Tài khoản không hợp lệ")
+//            );
         boolean hasPermission = service.checkPermissionByDomainId(realmId, from.getUserId(), from.getDomainId());
         return ResponseEntity.ok(hasPermission);
     }

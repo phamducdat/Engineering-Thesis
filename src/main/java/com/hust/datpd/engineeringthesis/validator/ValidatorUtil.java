@@ -102,7 +102,7 @@ public class ValidatorUtil {
         List<ClientRepresentation> clientRepresentationList = realmResource.clients().findAll();
 
         return clientRepresentationList.stream().anyMatch(element -> {
-            return Objects.equals(element.getRootUrl(), url);
+            return Objects.equals(element.getWebOrigins().get(0), url);
         });
     }
 
@@ -114,7 +114,11 @@ public class ValidatorUtil {
         List<ClientRepresentation> clientRepresentationList = realmResource.clients().findAll();
 
         return clientRepresentationList.stream().anyMatch(element -> {
-            return !Objects.equals(element.getId(), id) && Objects.equals(element.getRootUrl(), url);
+
+            if (!element.getWebOrigins().isEmpty())
+                return !Objects.equals(element.getId(), id)
+                        && Objects.equals(element.getWebOrigins().get(0), url);
+            return false;
         });
     }
 

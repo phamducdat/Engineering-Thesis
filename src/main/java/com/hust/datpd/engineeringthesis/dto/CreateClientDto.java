@@ -12,5 +12,5 @@ public class CreateClientDto {
 
     private String clientId;
 
-    private String rootUrl;
+    private String url;
 }

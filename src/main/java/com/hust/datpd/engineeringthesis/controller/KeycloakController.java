@@ -70,14 +70,14 @@ public class KeycloakController {
                     new ErrorResponse("Đã tồn tại domainId")
             );
         }
-        if (validatorUtil.clientExistsByURL(realm, from.getRootUrl())) {
+        if (validatorUtil.clientExistsByURL(realm, from.getUrl())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại url")
             );
         }
 
         keycloakService.createClient(realm, from.getId(),
-                from.getClientId(), from.getRootUrl());
+                from.getClientId(), from.getUrl());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
@@ -97,13 +97,13 @@ public class KeycloakController {
                     new ErrorResponse("Đã tồn tại domainId")
             );
         }
-        if (validatorUtil.clientExistsByURL(realm, id, from.getRootUrl())) {
+        if (validatorUtil.clientExistsByURL(realm, id, from.getUrl())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại url")
             );
         }
 
-        keycloakService.updateClient(realm, id, from.getClientId(), from.getRootUrl());
+        keycloakService.updateClient(realm, id, from.getClientId(), from.getUrl());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }

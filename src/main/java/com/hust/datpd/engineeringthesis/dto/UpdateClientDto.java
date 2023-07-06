@@ -9,5 +9,5 @@ public class UpdateClientDto {
 
     private String clientId;
 
-    private String rootUrl;
+    private String url;
 }
