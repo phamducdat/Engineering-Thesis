@@ -1,10 +1,14 @@
 package com.hust.datpd.engineeringthesis.controller;
 
-import com.hust.datpd.engineeringthesis.dto.*;
+import com.hust.datpd.engineeringthesis.dto.AdminKeycloakDto;
+import com.hust.datpd.engineeringthesis.dto.CreateClientDto;
+import com.hust.datpd.engineeringthesis.dto.KeycloakInfoDto;
+import com.hust.datpd.engineeringthesis.dto.UpdateClientDto;
 import com.hust.datpd.engineeringthesis.message.ErrorResponse;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import com.hust.datpd.engineeringthesis.validator.ValidatorUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,20 +58,26 @@ public class KeycloakController {
     }
 
     @PostMapping("/clients")
-    public ResponseEntity<?> createClient(@RequestBody CreateClientDto from) {
+    public ResponseEntity<?> createClient(@RequestBody CreateClientDto from,
+                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         if (validatorUtil.clientExistsByClientId(realm, from.getClientId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại domainId")
             );
         }
-        if (validatorUtil.clientExistsByURL(realm, from.getRootUrl())) {
+        if (validatorUtil.clientExistsByURL(realm, from.getUrl())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại url")
             );
         }
 
         keycloakService.createClient(realm, from.getId(),
-                from.getClientId(), from.getRootUrl());
+                from.getClientId(), from.getUrl());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
@@ -75,27 +85,27 @@ public class KeycloakController {
 
     @PutMapping("/clients/{id}")
     public ResponseEntity<?> updateClient(@RequestBody UpdateClientDto from,
-                                          @PathVariable String id) {
+                                          @PathVariable String id,
+                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         if (validatorUtil.clientExistsByClientId(realm, id, from.getClientId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại domainId")
             );
         }
-        if (validatorUtil.clientExistsByURL(realm, id, from.getRootUrl())) {
+        if (validatorUtil.clientExistsByURL(realm, id, from.getUrl())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ErrorResponse("Đã tồn tại url")
             );
         }
 
-        keycloakService.updateClient(realm, id, from.getClientId(), from.getRootUrl());
+        keycloakService.updateClient(realm, id, from.getClientId(), from.getUrl());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
-    @PostMapping("/realms")
-    public ResponseEntity<?> createRealm(@RequestBody RealmDto realmDto) {
-        keycloakService.createRealm(realmDto.getRealmName());
-        return ResponseEntity.ok(null);
-
-    }
 }

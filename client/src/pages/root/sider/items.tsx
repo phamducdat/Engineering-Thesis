@@ -27,22 +27,22 @@ export const items: ItemType[] = [
     },
     {
         key: "system",
-        label: "Hệ thống",
+        label: "Cài đặt",
         type: 'group',
         children: [
+            {
+                key: "settings",
+                icon: <GlobalOutlined/>,
+                label: <Link to={"system/settings"}>
+                    Hệ thống
+                </Link>
+
+            },
             {
                 key: "sessions",
                 icon: <SettingOutlined/>,
                 label: <Link to={"system/sessions"}>
                     Phiên hoạt động
-                </Link>
-
-            },
-            {
-                key: "settings",
-                icon: <GlobalOutlined />,
-                label: <Link to={"system/settings"}>
-                    Hệ thống
                 </Link>
 
             }

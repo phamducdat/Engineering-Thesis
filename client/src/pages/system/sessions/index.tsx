@@ -15,7 +15,7 @@ const Sessions: React.FC = () => {
     const {realmId} = useParams()
     const [dataSource, setDataSource] = useState()
     const [realmBriefRepresentation, setRealmBriefRepresentation] = useState()
-    const {setSpinning, reloadData, setReloadData, setTitle} = useRootContext()
+    const {setTitle} = useRootContext()
 
     useEffect(() => {
         setTitle("Phiên hoạt động")

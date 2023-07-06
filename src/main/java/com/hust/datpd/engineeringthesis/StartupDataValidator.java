@@ -8,6 +8,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.net.UnknownHostException;
+
 @Component
 public class StartupDataValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartupDataValidator.class);
@@ -24,7 +26,7 @@ public class StartupDataValidator {
     }
 
     @EventListener
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) throws UnknownHostException {
         LOGGER.info("Add app URL if they do not exist in the master realm");
         keycloakService.addWebOriginToAdminCli(keycloakRealm);
     }

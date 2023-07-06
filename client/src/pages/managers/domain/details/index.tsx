@@ -19,7 +19,10 @@ const DomainDetails: React.FC<{}> = (props) => {
     const [form] = Form.useForm()
     useEffect(() => {
         getClientById(realmId, domainId).then((response) => {
-            form.setFieldsValue(response)
+            form.setFieldsValue({
+                ...response,
+                url:response?.webOrigins[0]
+            })
             setTitle(`Thông tin domain: ${response?.clientId}`)
         })
 
@@ -59,7 +62,7 @@ const DomainDetails: React.FC<{}> = (props) => {
                             <Col span="6">
                                 <Form.Item
                                     label={"Đường dẫn:"}
-                                    name={"rootUrl"}
+                                    name={"url"}
                                     rules={[
                                         {
                                             message: "Vui lòng nhập đường dẫn",

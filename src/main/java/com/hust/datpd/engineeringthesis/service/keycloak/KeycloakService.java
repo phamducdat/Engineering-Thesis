@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.Response;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 @Service
@@ -45,13 +47,34 @@ public class KeycloakService {
         return keycloak.tokenManager().getAccessToken();
     }
 
+    public String getPublicKey(String realmName) {
+        try {
+            Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
+            RealmResource realmResource = keycloak.realm(realmName);
+
+            // get realm's keys
+            KeysMetadataRepresentation keys = realmResource.keys().getKeyMetadata();
+
+            // find the active RSA key
+            for (KeysMetadataRepresentation.KeyMetadataRepresentation key : keys.getKeys()) {
+                if (key.getType().equals("RSA")) {
+                    return key.getPublicKey();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public RealmResource getRealmResourceByRealmId(String realmId) {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
         return keycloak.realm(realmId);
     }
 
-    public void createRealm(String realmName) {
+    public void createRealm(String realmName) throws UnknownHostException {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -76,6 +99,8 @@ public class KeycloakService {
                              String id,
                              String clientId,
                              String url) {
+        String formatURL = formatURL(url);
+
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -86,11 +111,11 @@ public class KeycloakService {
 
         clientRepresentation.setClientId(clientId);
 
-        clientRepresentation.setAdminUrl(url);
-        clientRepresentation.setWebOrigins(Collections.singletonList(url));
-        clientRepresentation.setRedirectUris(Collections.singletonList(url));
-        clientRepresentation.setBaseUrl(url);
-        clientRepresentation.setRootUrl(url);
+        clientRepresentation.setAdminUrl(formatURL);
+        clientRepresentation.setWebOrigins(Collections.singletonList(formatURL));
+        clientRepresentation.setRedirectUris(Collections.singletonList(formatURL + "/*"));
+        clientRepresentation.setBaseUrl(formatURL);
+        clientRepresentation.setRootUrl(formatURL);
 
         realmResource.clients().get(id).update(clientRepresentation);
     }
@@ -99,6 +124,7 @@ public class KeycloakService {
                              String id,
                              String clientId,
                              String url) {
+        String formatURL = formatURL(url);
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -109,11 +135,11 @@ public class KeycloakService {
         clientRepresentation.setId(id);
         clientRepresentation.setClientId(clientId);
 
-        clientRepresentation.setAdminUrl(url);
-        clientRepresentation.setWebOrigins(Collections.singletonList(url));
-        clientRepresentation.setRedirectUris(Collections.singletonList(url));
-        clientRepresentation.setBaseUrl(url);
-        clientRepresentation.setRootUrl(url);
+        clientRepresentation.setAdminUrl(formatURL);
+        clientRepresentation.setWebOrigins(Collections.singletonList(formatURL));
+        clientRepresentation.setRedirectUris(Collections.singletonList(formatURL + "/*"));
+        clientRepresentation.setBaseUrl(formatURL);
+        clientRepresentation.setRootUrl(formatURL);
 
 
         clientRepresentation.setAttributes(null);
@@ -124,12 +150,12 @@ public class KeycloakService {
     }
 
 
-    public void addWebOriginToAdminCli(String realmName) {
+    public void addWebOriginToAdminCli(String realmName) throws UnknownHostException {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
         RealmResource realmResource = keycloak.realm(realmName);
-
+//        System.out.println("dat with realmResource = " + realmResource);
         List<ClientRepresentation> clients = realmResource.clients().findAll();
 
         // Find the "admin-cli" client
@@ -145,27 +171,24 @@ public class KeycloakService {
                     adminCliClient.getWebOrigins() : new ArrayList<>();
 
             String address;
-            if (serverProperties.getAddress() != null) {
-                address = String.valueOf(serverProperties.getAddress());
-            } else {
-                address = "http://localhost";
-            }
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            address = inetAddress.getHostAddress();
             int port = serverProperties.getPort();
-            String url = address + ":" + port;
+            String url = "http://" + address + ":" + port;
             // Add the new WebOrigin
 
 
             if (frontendUrl != null && webOrigins.stream().noneMatch(element -> {
                 return Objects.equals(element, frontendUrl);
             })) {
-                LOGGER.info("Add frontendURL like web origin in master realm");
+                LOGGER.info("Add frontendURL like web origin in master realm: " + frontendUrl);
                 webOrigins.add(frontendUrl);
             }
 
             if (webOrigins.stream().noneMatch(element -> {
                 return Objects.equals(url, element);
             })) {
-                LOGGER.info("Add backendURL like web origin in master realm");
+                LOGGER.info("Add backendURL like web origin in master realm: " + url);
                 webOrigins.add(url);
             }
 
@@ -262,5 +285,9 @@ public class KeycloakService {
         }
 
         return null;
+    }
+
+    public String formatURL(String inputURL) {
+        return inputURL.replaceAll("/$", "");
     }
 }

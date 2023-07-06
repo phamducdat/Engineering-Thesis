@@ -56,7 +56,7 @@ export const CreateClient: React.FC<ModalProps> = props => {
                     <Col span={8}>
                         <Form.Item
                             label={"Đường dẫn:"}
-                            name={"rootUrl"}
+                            name={"url"}
                             rules={[
                                 {
                                     message: "Vui lòng nhập đường dẫn",
