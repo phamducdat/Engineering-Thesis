@@ -102,7 +102,9 @@ public class ValidatorUtil {
         List<ClientRepresentation> clientRepresentationList = realmResource.clients().findAll();
 
         return clientRepresentationList.stream().anyMatch(element -> {
-            return Objects.equals(element.getWebOrigins().get(0), url);
+            if (!element.getWebOrigins().isEmpty())
+                return Objects.equals(element.getWebOrigins().get(0), url);
+            return false;
         });
     }
 

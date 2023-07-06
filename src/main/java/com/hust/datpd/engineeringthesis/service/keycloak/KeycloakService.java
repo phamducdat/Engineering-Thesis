@@ -99,6 +99,8 @@ public class KeycloakService {
                              String id,
                              String clientId,
                              String url) {
+        String formatURL = formatURL(url);
+
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -109,11 +111,11 @@ public class KeycloakService {
 
         clientRepresentation.setClientId(clientId);
 
-        clientRepresentation.setAdminUrl(url);
-        clientRepresentation.setWebOrigins(Collections.singletonList(url));
-        clientRepresentation.setRedirectUris(Collections.singletonList(url));
-        clientRepresentation.setBaseUrl(url);
-        clientRepresentation.setRootUrl(url);
+        clientRepresentation.setAdminUrl(formatURL);
+        clientRepresentation.setWebOrigins(Collections.singletonList(formatURL));
+        clientRepresentation.setRedirectUris(Collections.singletonList(formatURL + "/*"));
+        clientRepresentation.setBaseUrl(formatURL);
+        clientRepresentation.setRootUrl(formatURL);
 
         realmResource.clients().get(id).update(clientRepresentation);
     }
@@ -122,6 +124,7 @@ public class KeycloakService {
                              String id,
                              String clientId,
                              String url) {
+        String formatURL = formatURL(url);
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -132,11 +135,11 @@ public class KeycloakService {
         clientRepresentation.setId(id);
         clientRepresentation.setClientId(clientId);
 
-        clientRepresentation.setAdminUrl(url);
-        clientRepresentation.setWebOrigins(Collections.singletonList(url));
-        clientRepresentation.setRedirectUris(Collections.singletonList(url));
-        clientRepresentation.setBaseUrl(url);
-        clientRepresentation.setRootUrl(url);
+        clientRepresentation.setAdminUrl(formatURL);
+        clientRepresentation.setWebOrigins(Collections.singletonList(formatURL));
+        clientRepresentation.setRedirectUris(Collections.singletonList(formatURL + "/*"));
+        clientRepresentation.setBaseUrl(formatURL);
+        clientRepresentation.setRootUrl(formatURL);
 
 
         clientRepresentation.setAttributes(null);
@@ -282,5 +285,9 @@ public class KeycloakService {
         }
 
         return null;
+    }
+
+    public String formatURL(String inputURL) {
+        return inputURL.replaceAll("/$", "");
     }
 }
