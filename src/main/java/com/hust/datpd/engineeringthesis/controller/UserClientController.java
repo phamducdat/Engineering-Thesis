@@ -4,9 +4,12 @@ import com.hust.datpd.engineeringthesis.dto.ClientUserDto;
 import com.hust.datpd.engineeringthesis.dto.PermissionRequestDomainId;
 import com.hust.datpd.engineeringthesis.dto.PermissionRequestUrl;
 import com.hust.datpd.engineeringthesis.dto.UserClientDto;
+import com.hust.datpd.engineeringthesis.message.ErrorResponse;
 import com.hust.datpd.engineeringthesis.service.UserClientService;
 import com.hust.datpd.engineeringthesis.validator.ValidatorUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,35 +31,41 @@ public class UserClientController {
     }
 
     @GetMapping("/clients/{clientId}")
-    public ResponseEntity<ClientUserDto> getClientUsersByClientId(@PathVariable String clientId,
-                                                                  @PathVariable String realmId) {
+    public ResponseEntity<?> getClientUsersByClientId(@PathVariable String clientId,
+                                                      @PathVariable String realmId,
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         return ResponseEntity.ok(service.getClientUsersByClientId(realmId, clientId));
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserClientDto> getUserClientsByUserId(@PathVariable String realmId,
-                                                                @PathVariable String userId) {
+    public ResponseEntity<?> getUserClientsByUserId(@PathVariable String realmId,
+                                                    @PathVariable String userId,
+                                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         return ResponseEntity.ok(service.getUserClientsByUserId(realmId, userId));
     }
 
-//    @GetMapping("/users/{userId}/clients/{clientId}/permission")
-//    public ResponseEntity<?> checkUserClient(
-//            @PathVariable String clientId,
-//            @PathVariable String realmId,
-//            @PathVariable String userId) {
-//        if (!validatorUtil.realmExists(realmId))
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Không tồn realmId"));
-//        if (!validatorUtil.clientExistsByClientId(realmId, clientId))
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Không tồn clientId"));
-//        if (!validatorUtil.userExists(realmId, userId))
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Không tồn tại userId"));
-//
-//        return ResponseEntity.ok(service.checkUserClient(realmId, clientId, userId));
-//    }
-
 
     @PostMapping("/check-permission/url")
-    public ResponseEntity<?> checkPermissionByUrl(@RequestBody PermissionRequestUrl from, @PathVariable String realmId) {
+    public ResponseEntity<?> checkPermissionByUrl(@RequestBody PermissionRequestUrl from,
+                                                  @PathVariable String realmId,
+                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         boolean hasPermission = service.checkPermissionByUrl(realmId, from.getUserId(), from.getUrl());
         return ResponseEntity.ok(hasPermission);
     }
@@ -64,52 +73,89 @@ public class UserClientController {
 
     @PostMapping("/check-permission/domain")
     public ResponseEntity<?> checkPermissionByDomainId(@RequestBody PermissionRequestDomainId from,
-                                                       @PathVariable String realmId) {
+                                                       @PathVariable String realmId,
+                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         boolean hasPermission = service.checkPermissionByDomainId(realmId, from.getUserId(), from.getDomainId());
         return ResponseEntity.ok(hasPermission);
     }
 
 
     @DeleteMapping("/users/{userId}")
-    public void deleteUserClient(
+    public ResponseEntity<?> deleteUserClient(
             @PathVariable String realmId,
             @PathVariable String userId,
-            @RequestBody UserClientDto dto) {
+            @RequestBody UserClientDto dto,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         service.deleteUserClients(realmId, userId, dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("clients/{clientId}")
-    public void deleteClientUsers(
+    public ResponseEntity<?> deleteClientUsers(
             @PathVariable String clientId,
             @PathVariable String realmId,
-            @RequestBody ClientUserDto dto) {
-        service.deleteClientUsers(realmId, clientId, dto);
+            @RequestBody ClientUserDto dto,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
+        service.deleteClientUsers(realmId, clientId, dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/users/{userId}")
-    public void createUserClients(
+    public ResponseEntity<?> createUserClients(
             @PathVariable String realmId,
             @PathVariable String userId,
-            @RequestBody UserClientDto from
+            @RequestBody UserClientDto from,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
     ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
         service.createUserClients(
                 realmId,
                 userId,
                 from
         );
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/clients/{clientId}")
-    public void createClientUsers(@PathVariable String clientId,
-                                  @PathVariable String realmId,
-                                  @RequestBody ClientUserDto from) {
+    public ResponseEntity<?> createClientUsers(@PathVariable String clientId,
+                                               @PathVariable String realmId,
+                                               @RequestBody ClientUserDto from,
+                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
+    ) {
+        if (!validatorUtil.validToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
 
         service.createClientUsers(
                 realmId,
                 clientId,
                 from
         );
+        return ResponseEntity.status(HttpStatus.OK).build();
+
     }
 
 

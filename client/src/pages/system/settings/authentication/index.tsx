@@ -15,6 +15,7 @@ import {DP_Table} from "../../../../custom/data-display/table";
 import {Button, Checkbox, Col, message, Row, Select, Space} from "antd";
 import {DownOutlined, UpOutlined} from "@ant-design/icons";
 import {CheckboxChangeEvent} from "antd/es/checkbox";
+import {useRootContext} from "../../../root/context/useRootContext";
 
 
 const Authentication: React.FC = () => {
@@ -26,6 +27,7 @@ const Authentication: React.FC = () => {
     const [noDCX509Installed, setNoDCX509Installed] = useState(false)
     const [configAuthData, setConfigAuthData] = useState<any>()
     const [flag, setFlag] = useState(false)
+    const {setTitle} = useRootContext()
 
 
     function getData() {
@@ -67,6 +69,7 @@ const Authentication: React.FC = () => {
 
 
     useMemo(() => {
+        setTitle("Xác thực")
         getData();
     }, [])
 

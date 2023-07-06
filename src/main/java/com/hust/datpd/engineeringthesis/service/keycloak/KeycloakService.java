@@ -47,6 +47,27 @@ public class KeycloakService {
         return keycloak.tokenManager().getAccessToken();
     }
 
+    public String getPublicKey(String realmName) {
+        try {
+            Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
+            RealmResource realmResource = keycloak.realm(realmName);
+
+            // get realm's keys
+            KeysMetadataRepresentation keys = realmResource.keys().getKeyMetadata();
+
+            // find the active RSA key
+            for (KeysMetadataRepresentation.KeyMetadataRepresentation key : keys.getKeys()) {
+                if (key.getType().equals("RSA")) {
+                    return key.getPublicKey();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public RealmResource getRealmResourceByRealmId(String realmId) {
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();

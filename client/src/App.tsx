@@ -46,9 +46,6 @@ function App() {
                         <Route path={'sessions'} element={<Sessions/>}/>
                         <Route path={'settings'} element={<Settings/>}/>
                     </Route>
-                    <Route path={"settings"}>
-                        <Route path={"system"} element={<System/>}/>
-                    </Route>
                 </Route>
                 <Route path={"/login"} element={<Login/>}/>
                 <Route path={"/registration"} element={<Registration/>}/>

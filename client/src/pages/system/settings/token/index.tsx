@@ -3,6 +3,7 @@ import {DP_Form} from "../../../../custom/data-entry/form";
 import {Button, Col, Form, InputNumber, Row, Select} from "antd";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {useParams} from "react-router-dom";
+import {useRootContext} from "../../../root/context/useRootContext";
 
 
 const Token: React.FC = () => {
@@ -14,6 +15,9 @@ const Token: React.FC = () => {
         accessTokenLifespanStyle: 'minutes',
     })
 
+    const {setTitle} = useRootContext()
+
+
     function getData() {
         getRealmInfoByRealmId(realmId).then((response) => {
             form.setFieldsValue(convertDataToForm(response))
@@ -21,6 +25,7 @@ const Token: React.FC = () => {
     }
 
     useEffect(() => {
+        setTitle("Token")
         getData();
     }, [])
 
