@@ -61,8 +61,8 @@ export const Domain: React.FC = () => {
         },
         {
             title: "Domain",
-            dataIndex: "rootUrl",
-            key: "rootUrl"
+            dataIndex: "webOrigins",
+            key: "webOrigins"
         },
         {
             title: "",
