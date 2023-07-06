@@ -3,7 +3,7 @@ import DP_axios from "../../custom/axios";
 
 export const getAllClients = async (realmId: string | undefined,
                                     params: object = {}) => {
-    const response = await DP_axios.get(`/admin/realms/${realmId}/clients`,{params});
+    const response = await DP_axios.get(`/admin/realms/${realmId}/clients`, {params});
     return response.data || []
 }
 
@@ -56,7 +56,9 @@ export const getUserSessionsByClientId = async (realmId: string | undefined,
     return response?.data || []
 }
 
-export const getAllClientSessions = async (realmId: string | undefined) => {
-    const response = await DP_axios.get(`/admin/realms/${realmId}/client-session-stats`)
+export const getAllClientSessions = async (realmId: string | undefined,
+                                           params: object = {}) => {
+    const response = await DP_axios.get(`/admin/realms/${realmId}/client-session-stats`,
+        {params})
     return response?.data || []
 }
