@@ -3,7 +3,9 @@ import DP_axios from "../../custom/axios";
 
 export const getAllClients = async (realmId: string | undefined,
                                     params: object = {}) => {
-    const response = await DP_axios.get(`/admin/realms/${realmId}/clients`, {params});
+    const response = await DP_axios.get(`/admin/realms/${realmId}/clients`, {
+        params
+    });
     return response.data || []
 }
 

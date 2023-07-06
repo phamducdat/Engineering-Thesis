@@ -12,7 +12,7 @@ import TabPane = Tabs.TabPane;
 export const Domain: React.FC = () => {
 
     const {realmId} = useParams()
-    const [dataSource, setDataSource] = useState()
+    const [dataSource, setDataSource] = useState<any[]>()
     const [openCreateModal, setOpenCreateModal] = useState(false)
     const {setTitle, reloadData, setReloadData} = useRootContext()
     const [searchParams] = useSearchParams()
@@ -23,10 +23,9 @@ export const Domain: React.FC = () => {
         const search = searchParams.get('search')
         getAllClients(realmId, {
             clientId: search,
-            search: true
+            search: true,
         }).then((response) => {
             setDataSource(filterClient(response))
-
         })
     }
 
