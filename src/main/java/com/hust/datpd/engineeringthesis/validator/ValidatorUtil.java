@@ -144,16 +144,14 @@ public class ValidatorUtil {
     }
 
     public boolean validToken(String token) {
+        keycloakService.getKeycloak().tokenManager().getAccessToken().
         RestTemplate restTemplate = new RestTemplate();
 
         // Set request headers
         HttpHeaders headers = new HttpHeaders();
-        headers.add("User-Agent", "insomnia/2023.4.0");
         headers.add("Content-Type", "application/json");
         headers.add("Authorization", token);
 
-        // Create the API URL
-//        String apiUrl = "http://localhost:8080/auth/realms/master/protocol/openid-connect/userinfo";
         String apiUrl = keycloakServerUrl + "/realms/" + keycloakRealm + "/protocol/openid-connect/userinfo";
 
         // Create the HttpEntity with headers

@@ -2,6 +2,7 @@ import axios, {AxiosRequestConfig} from "axios";
 import qs from "qs";
 import {message} from "antd";
 import {getMe} from "../../api/admin";
+import {convertWarningMessage} from "./util";
 
 export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
     captureLocationHeader?: boolean;
@@ -117,7 +118,7 @@ DP_axios.interceptors.response.use(
         } else {
             if (config.disableMessage == undefined || !config.disableMessage)
 
-                message.warning(error.response?.data.errorMessage)
+                message.warning(convertWarningMessage(error.response?.data.errorMessage))
         }
 
         // Unhandled error, throw it to make sure it gets caught somewhere
