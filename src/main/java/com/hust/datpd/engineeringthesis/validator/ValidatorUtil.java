@@ -1,5 +1,8 @@
 package com.hust.datpd.engineeringthesis.validator;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakInstanceFactory;
 import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import org.keycloak.admin.client.Keycloak;
@@ -143,8 +146,7 @@ public class ValidatorUtil {
         }
     }
 
-    public boolean validToken(String token) {
-        keycloakService.getKeycloak().tokenManager().getAccessToken().
+    public boolean validAdminToken(String token) {
         RestTemplate restTemplate = new RestTemplate();
 
         // Set request headers
@@ -169,8 +171,13 @@ public class ValidatorUtil {
             // Process the response
             if (response.getStatusCode().is2xxSuccessful()) {
                 String responseBody = response.getBody();
-                System.out.println(responseBody);
-                return true;
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+                String sub = jsonNode.get("sub").asText();
+                boolean emailVerified = jsonNode.get("email_verified").asBoolean();
+                String preferredUsername = jsonNode.get("preferred_username").asText();
+                return Objects.equals(preferredUsername, "admin");
             } else {
                 System.out.println("Request failed with status code: " + response.getStatusCodeValue());
                 return false;
@@ -178,6 +185,9 @@ public class ValidatorUtil {
         } catch (HttpClientErrorException ex) {
             System.out.println("Request failed with status code: " + ex.getRawStatusCode());
             System.out.println(ex.getResponseBodyAsString());
+            return false;
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
             return false;
         }
 

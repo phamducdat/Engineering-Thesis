@@ -61,7 +61,7 @@ public class KeycloakController {
     public ResponseEntity<?> createClient(@RequestBody CreateClientDto from,
                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
@@ -88,7 +88,7 @@ public class KeycloakController {
                                           @PathVariable String id,
                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
