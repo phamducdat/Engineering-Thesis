@@ -1,6 +1,5 @@
 package com.hust.datpd.engineeringthesis.service.keycloak;
 
-import com.hust.datpd.engineeringthesis.StartupDataValidator;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -28,8 +27,6 @@ public class KeycloakService {
     private final ServerProperties serverProperties;
 
     private final KeycloakInstanceFactory keycloakInstanceFactory;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(StartupDataValidator.class);
 
 
     public KeycloakService(ServerProperties serverProperties, KeycloakInstanceFactory keycloakInstanceFactory) {
@@ -90,7 +87,7 @@ public class KeycloakService {
         } catch (ClientErrorException e) {
             Response response = e.getResponse();
             String errorMessage = response.readEntity(String.class);
-            LOGGER.error("Failed to create realm. Error message: " + errorMessage);
+//            LOGGER.error("Failed to create realm. Error message: " + errorMessage);
             throw e;
         }
     }
@@ -181,14 +178,14 @@ public class KeycloakService {
             if (frontendUrl != null && webOrigins.stream().noneMatch(element -> {
                 return Objects.equals(element, frontendUrl);
             })) {
-                LOGGER.info("Add frontendURL like web origin in master realm: " + frontendUrl);
+//                LOGGER.info("Add frontendURL like web origin in master realm: " + frontendUrl);
                 webOrigins.add(frontendUrl);
             }
 
             if (webOrigins.stream().noneMatch(element -> {
                 return Objects.equals(url, element);
             })) {
-                LOGGER.info("Add backendURL like web origin in master realm: " + url);
+//                LOGGER.info("Add backendURL like web origin in master realm: " + url);
                 webOrigins.add(url);
             }
 
