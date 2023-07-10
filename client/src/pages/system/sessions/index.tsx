@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useParams} from "react-router-dom";
+import {Link, useParams, useSearchParams} from "react-router-dom";
 import {getAllClientSessions} from "../../../api/clients";
 import {useRootContext} from '../../root/context/useRootContext';
 import DP_Tabs from "../../../custom/data-display/tabs";
@@ -13,9 +13,11 @@ import TabPane = Tabs.TabPane;
 const Sessions: React.FC = () => {
 
     const {realmId} = useParams()
-    const [dataSource, setDataSource] = useState()
+    const [dataSource, setDataSource] = useState<any[]>()
+    const [originalDataSource, setOriginalDataSource] = useState<any[]>()
     const [realmBriefRepresentation, setRealmBriefRepresentation] = useState()
     const {setTitle} = useRootContext()
+    const [searchParams] = useSearchParams()
 
     useEffect(() => {
         setTitle("Phiên hoạt động")
@@ -23,9 +25,19 @@ const Sessions: React.FC = () => {
             setRealmBriefRepresentation(response)
         })
         getAllClientSessions(realmId).then((response) => {
-            setDataSource(filterClient(response))
+            setOriginalDataSource(filterClient(response))
         })
     }, [realmId])
+
+
+    useEffect(() => {
+        if (searchParams.get('search')
+            && originalDataSource !== undefined) {
+            const data = originalDataSource.filter((element: any) => element.clientId.indexOf(searchParams.get('search')) !== -1)
+            setDataSource(data)
+        } else
+            setDataSource(originalDataSource)
+    }, [searchParams, originalDataSource])
 
     const columns = [
         {

@@ -7,7 +7,6 @@ export const DP_Table: React.FC<TableProps<any>> = props => {
             <Table
                 {...props}
                 sticky
-
             />
         </>
     );

@@ -36,7 +36,7 @@ public class UserClientController {
                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
@@ -48,7 +48,7 @@ public class UserClientController {
                                                     @PathVariable String userId,
                                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
@@ -93,7 +93,7 @@ public class UserClientController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
@@ -109,7 +109,7 @@ public class UserClientController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
@@ -125,7 +125,7 @@ public class UserClientController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );
@@ -144,7 +144,7 @@ public class UserClientController {
                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-        if (!validatorUtil.validToken(authHeader))
+        if (!validatorUtil.validAdminToken(authHeader))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ErrorResponse("Tài khoản không hợp lệ")
             );

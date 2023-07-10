@@ -23,7 +23,7 @@ const RootPage: React.FC = () => {
             spinning,
             setSpinning
         }}>
-            <Layout style={{minHeight: '100vh'}}>
+            <Layout style={{minHeight: '100vh', overflow: 'hidden'}}>
                 <DP_Sider/>
                 <Layout style={{height: "100vh"}}>
                     <DP_Header/>

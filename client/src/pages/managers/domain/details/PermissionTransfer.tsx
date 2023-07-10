@@ -82,6 +82,7 @@ export const PermissionTransfer: React.FC<{}> = props => {
                 onChange={onChange}
                 onSelectChange={onSelectChange}
                 render={(item) => item.title}
+                showSearch
             />}
         </>
     );
