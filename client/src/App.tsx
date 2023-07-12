@@ -9,8 +9,6 @@ import {Domain} from "./pages/managers/domain";
 import {Home} from "./pages/home";
 import DomainDetails from "./pages/managers/domain/details";
 import {CreateClient} from "./pages/managers/domain/CreateClient";
-import System from "./pages/settings/system";
-import Registration from "./pages/registration";
 import {refreshAccessToken} from "./custom/axios";
 import Sessions from "./pages/system/sessions";
 import Settings from "./pages/system/settings";
@@ -47,7 +45,6 @@ function App() {
                     </Route>
                 </Route>
                 <Route path={"/login"} element={<Login/>}/>
-                <Route path={"/registration"} element={<Registration/>}/>
             </Routes>
         </>
     )

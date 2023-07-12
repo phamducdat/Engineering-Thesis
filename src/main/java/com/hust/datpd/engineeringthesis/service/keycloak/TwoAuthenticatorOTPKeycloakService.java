@@ -60,8 +60,8 @@ public class TwoAuthenticatorOTPKeycloakService {
 
             // Remove CONFIGURE_OTP from required actions if it is there
             List<String> requiredActions = user.getRequiredActions();
-            if (requiredActions.contains("CONFIGURE_OTP")) {
-                requiredActions.remove("CONFIGURE_OTP");
+            if (requiredActions.contains("CONFIGURE_TOTP")) {
+                requiredActions.remove("CONFIGURE_TOTP");
                 user.setRequiredActions(requiredActions);
 
                 // Update the user
