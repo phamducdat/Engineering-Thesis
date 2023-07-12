@@ -1,29 +1,24 @@
 package com.hust.datpd.engineeringthesis.service.keycloak;
 
-import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.AccessTokenResponse;
-import org.keycloak.representations.idm.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.KeysMetadataRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.Response;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.URI;
 import java.util.*;
 
 @Service
 public class KeycloakService {
 
-    @Value("${frontendUrl}")
-    private String frontendUrl;
+
+    @Value("${keycloak.realm}")
+    private String keycloakRealm;
     private final ServerProperties serverProperties;
 
     private final KeycloakInstanceFactory keycloakInstanceFactory;
@@ -39,9 +34,12 @@ public class KeycloakService {
         return keycloakInstanceFactory.getKeycloakInstance();
     }
 
-    public AccessTokenResponse getAdminKeycloakAccessToken() {
+    public AccessTokenResponse getAdminKeycloakAccessToken(@NotNull String externalServerURL) {
         Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
-        return keycloak.tokenManager().getAccessToken();
+        AccessTokenResponse to = keycloak.tokenManager().getAccessToken();
+        addWebOriginToAdminCli(keycloakRealm, externalServerURL);
+        return to;
+
     }
 
     public String getPublicKey(String realmName) {
@@ -71,26 +69,6 @@ public class KeycloakService {
         return keycloak.realm(realmId);
     }
 
-    public void createRealm(String realmName) throws UnknownHostException {
-        Keycloak keycloak =
-                keycloakInstanceFactory.getKeycloakInstance();
-
-        RealmRepresentation realmRepresentation =
-                new RealmRepresentation();
-        realmRepresentation.setId(realmName);
-        realmRepresentation.setRealm(realmName);
-        realmRepresentation.setEnabled(true);
-
-        try {
-            keycloak.realms().create(realmRepresentation);
-            addWebOriginToAdminCli(realmName);
-        } catch (ClientErrorException e) {
-            Response response = e.getResponse();
-            String errorMessage = response.readEntity(String.class);
-//            LOGGER.error("Failed to create realm. Error message: " + errorMessage);
-            throw e;
-        }
-    }
 
     public void updateClient(String realmName,
                              String id,
@@ -147,7 +125,8 @@ public class KeycloakService {
     }
 
 
-    public void addWebOriginToAdminCli(String realmName) throws UnknownHostException {
+    public void addWebOriginToAdminCli(String realmName, String externalServerURL) {
+        String externalServerURLFormatted = formatURL(externalServerURL);
         Keycloak keycloak =
                 keycloakInstanceFactory.getKeycloakInstance();
 
@@ -167,88 +146,17 @@ public class KeycloakService {
             List<String> webOrigins = adminCliClient.getWebOrigins() != null ?
                     adminCliClient.getWebOrigins() : new ArrayList<>();
 
-            String address;
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            address = inetAddress.getHostAddress();
-            int port = serverProperties.getPort();
-            String url = "http://" + address + ":" + port;
-            // Add the new WebOrigin
-
-
-            if (frontendUrl != null && webOrigins.stream().noneMatch(element -> {
-                return Objects.equals(element, frontendUrl);
-            })) {
-//                LOGGER.info("Add frontendURL like web origin in master realm: " + frontendUrl);
-                webOrigins.add(frontendUrl);
-            }
 
             if (webOrigins.stream().noneMatch(element -> {
-                return Objects.equals(url, element);
+                return Objects.equals(element, externalServerURLFormatted);
             })) {
-//                LOGGER.info("Add backendURL like web origin in master realm: " + url);
-                webOrigins.add(url);
+                webOrigins.add(externalServerURLFormatted);
+                adminCliClient.setWebOrigins(webOrigins);
+                realmResource.clients().get(adminCliClient.getId()).update(adminCliClient);
             }
-
-            // Update the WebOrigins
-            adminCliClient.setWebOrigins(webOrigins);
-
-            // Update the client in Keycloak
-            realmResource.clients().get(adminCliClient.getId()).update(adminCliClient);
         }
     }
 
-    public String createUser(String realmName,
-                             String userName,
-                             String email,
-                             String firstName,
-                             String lastName,
-                             String password) {
-        Keycloak keycloak =
-                keycloakInstanceFactory.getKeycloakInstance();
-
-        UserRepresentation userRepresentation =
-                new UserRepresentation();
-
-        userRepresentation.setUsername(userName);
-        userRepresentation.setEmail(email);
-        userRepresentation.setFirstName(firstName);
-        userRepresentation.setLastName(lastName);
-        userRepresentation.setEnabled(true);
-
-        CredentialRepresentation passwordCred = new CredentialRepresentation();
-        passwordCred.setTemporary(false);
-        passwordCred.setType(CredentialRepresentation.PASSWORD);
-        passwordCred.setValue(password);
-
-        userRepresentation.setCredentials(Arrays.asList(passwordCred));
-        Response response = keycloak.realm(realmName).users().create(userRepresentation);
-        if (response.getStatus() == 201) {
-            return CreatedResponseUtil.getCreatedId(response);
-        }
-        return null;
-    }
-
-    public void grantRealmAdminPermission(String realmName, String userId) {
-        Keycloak keycloak =
-                keycloakInstanceFactory.getKeycloakInstance();
-
-        RealmResource realmResource = keycloak.realm(realmName);
-
-        UserResource userResource =
-                realmResource.users().get(userId);
-
-        ClientRepresentation clientRepresentation = realmResource
-                .clients()
-                .findByClientId("realm-management").get(0);
-
-        RoleRepresentation roleRepresentation = realmResource
-                .clients()
-                .get(clientRepresentation.getId())
-                .roles()
-                .get("realm-admin").toRepresentation();
-
-        userResource.roles().clientLevel(clientRepresentation.getId()).add(Collections.singletonList(roleRepresentation));
-    }
 
     public String getIdOfClientByRealmNameAndClientId(@NotNull String realmName,
                                                       @NotNull String clientId) {
@@ -285,6 +193,17 @@ public class KeycloakService {
     }
 
     public String formatURL(String inputURL) {
-        return inputURL.replaceAll("/$", "");
+        try {
+            URI uri = new URI(inputURL);
+            String origin = uri.getScheme() + "://" + uri.getHost();
+            if (uri.getPort() != -1) {
+                origin += ":" + uri.getPort();
+            }
+            return origin;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error: can't convert the inputURL");
+        }
+        return null;
     }
 }

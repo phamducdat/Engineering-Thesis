@@ -27,7 +27,8 @@ export const Login: React.FC = () => {
                 navigate(`/realm/master/managers/domain`)
             }
         }).catch(error => {
-            message.warning(error.response.data.errorMessage)
+            if (error.response.status !== 500)
+                message.warning(error.response.data.errorMessage)
         }).finally(() => {
             setLoading(false)
         })
@@ -109,7 +110,6 @@ export const Login: React.FC = () => {
 
                     </Row>
                 </Form>
-
 
 
             </Card>

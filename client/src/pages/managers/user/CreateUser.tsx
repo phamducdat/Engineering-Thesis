@@ -25,7 +25,7 @@ export const CreateUser: React.FC = () => {
         }).then((response) => {
             const location = response.location
             const userId = location.substring(location.lastIndexOf('/') + 1)
-            navigate(`/realm/${realmId}/managers/user/${userId}?tab-key=credentials`)
+            navigate(`/realm/${realmId}/managers/user/${userId}?tab-key=userDetails`)
         })
     }
 

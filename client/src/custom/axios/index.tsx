@@ -116,9 +116,9 @@ DP_axios.interceptors.response.use(
                 throw e;
             }
         } else {
-            if (config.disableMessage == undefined || !config.disableMessage)
-
-                message.warning(convertWarningMessage(error.response?.data.errorMessage))
+            if (config.disableMessage == undefined || !config.disableMessage) {
+                    message.warning(convertWarningMessage(error.response?.data.errorMessage))
+            }
         }
 
         // Unhandled error, throw it to make sure it gets caught somewhere
