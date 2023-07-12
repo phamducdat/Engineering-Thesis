@@ -60,14 +60,14 @@ export const getClientUsersByClientId = async (realmId: string | undefined,
 export const createUserClients = async (realmId: string | undefined,
                                         userId: string | undefined,
                                         data: object) => {
-    const response = await DP_keycloakAxios.post(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}`, data)
+    const response = await DP_externalServerAxios.post(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}`, data)
     return response?.data
 }
 
 export const createClientUsers = async (realmId: string | undefined,
                                         clientId: string | undefined,
                                         data: object) => {
-    const response = await DP_keycloakAxios.post(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`, data)
+    const response = await DP_externalServerAxios.post(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`, data)
     return response?.data
 }
 
@@ -87,7 +87,7 @@ export const deleteClientUsers = async (
     clientId: string | undefined,
     data: object
 ) => {
-    const response = await DP_keycloakAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`, {
+    const response = await DP_externalServerAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`, {
         data: data
     });
     return response?.data;
