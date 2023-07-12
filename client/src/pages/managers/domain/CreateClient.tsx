@@ -27,7 +27,6 @@ export const CreateClient: React.FC<ModalProps> = props => {
             ...value,
             "id": id,
         }).then((response) => {
-            message.success("Tạo mới thành công")
             navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=details`)
         })
     }
