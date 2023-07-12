@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserClientService {
@@ -50,24 +51,24 @@ public class UserClientService {
         return mapper.mapFromListEntitiesToUserClientDto(repository.findByIdRealmIdAndIdUserId(realmId, userId));
     }
 
-    public boolean checkPermissionByDomainId(String realmId, String userId, String domainId) {
+    public Optional<UserClientEntity> checkUserClientEntityByDomainId(String realmId, String userId, String domainId) {
         UserClientId id = new UserClientId();
 
         id.setRealmId(realmId);
         id.setClientId(keycloakService.getIdOfClientByRealmNameAndClientId(realmId, domainId));
         id.setUserId(userId);
 
-        return repository.findById(id).isPresent();
+        return repository.findById(id);
     }
 
-    public boolean checkPermissionByUrl(String realmId, String userId, String url) {
+    public Optional<UserClientEntity> checkUserClientEntityByURL(String realmId, String userId, String url) {
         UserClientId id = new UserClientId();
 
         id.setRealmId(realmId);
         id.setClientId(keycloakService.getIdOfClientByRealmNameAndUrl(realmId, url));
         id.setUserId(userId);
 
-        return repository.findById(id).isPresent();
+        return repository.findById(id);
     }
 
 

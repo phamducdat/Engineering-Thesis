@@ -4,14 +4,20 @@ import com.hust.datpd.engineeringthesis.dto.ClientUserDto;
 import com.hust.datpd.engineeringthesis.dto.PermissionRequestDomainId;
 import com.hust.datpd.engineeringthesis.dto.PermissionRequestUrl;
 import com.hust.datpd.engineeringthesis.dto.UserClientDto;
+import com.hust.datpd.engineeringthesis.entity.userclient.UserClientEntity;
 import com.hust.datpd.engineeringthesis.message.ErrorResponse;
 import com.hust.datpd.engineeringthesis.service.UserClientService;
+import com.hust.datpd.engineeringthesis.service.keycloak.KeycloakService;
 import com.hust.datpd.engineeringthesis.validator.ValidatorUtil;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -19,14 +25,17 @@ import org.springframework.web.bind.annotation.*;
 public class UserClientController {
 
     final UserClientService service;
+
+    final KeycloakService keycloakService;
     final ValidatorUtil validatorUtil;
 
     @Value("${keycloak.realm")
     private String realm;
 
 
-    public UserClientController(UserClientService service, ValidatorUtil validatorUtil) {
+    public UserClientController(UserClientService service, KeycloakService keycloakService, ValidatorUtil validatorUtil) {
         this.service = service;
+        this.keycloakService = keycloakService;
         this.validatorUtil = validatorUtil;
     }
 
@@ -62,12 +71,15 @@ public class UserClientController {
 //                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
 
     ) {
-//        if (!validatorUtil.validToken(authHeader))
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-//                    new ErrorResponse("Tài khoản không hợp lệ")
-//            );
-        boolean hasPermission = service.checkPermissionByUrl(realmId, from.getUserId(), from.getUrl());
-        return ResponseEntity.ok(hasPermission);
+        Optional<UserClientEntity> entity = service.checkUserClientEntityByURL(realmId, from.getUserId(), from.getUrl());
+        if (entity.isPresent()) {
+            return ResponseEntity.ok(true);
+        } else {
+            UserRepresentation adminAccount = keycloakService.getAdminAccount();
+            if (Objects.equals(adminAccount.getId(), from.getUserId()))
+                return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.ok(false);
     }
 
 
@@ -76,12 +88,16 @@ public class UserClientController {
                                                        @PathVariable String realmId
 //                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
-//        if (!validatorUtil.validToken(authHeader))
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-//                    new ErrorResponse("Tài khoản không hợp lệ")
-//            );
-        boolean hasPermission = service.checkPermissionByDomainId(realmId, from.getUserId(), from.getDomainId());
-        return ResponseEntity.ok(hasPermission);
+
+        Optional<UserClientEntity> entity = service.checkUserClientEntityByDomainId(realmId, from.getUserId(), from.getDomainId());
+        if (entity.isPresent()) {
+            return ResponseEntity.ok(true);
+        } else {
+            UserRepresentation adminAccount = keycloakService.getAdminAccount();
+            if (Objects.equals(adminAccount.getId(), from.getUserId()))
+                return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.ok(false);
     }
 
 
