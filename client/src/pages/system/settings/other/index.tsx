@@ -9,13 +9,13 @@ import {useRootContext} from "../../../root/context/useRootContext";
 const Other: React.FC = () => {
 
     const {realmId} = useParams()
+    const {setTitle} = useRootContext()
     const [form] = Form.useForm()
     const [fieldsChange, setFieldsChange] = useState(false)
     const [options, setOptions] = useState({
         accessTokenLifespanStyle: 'minutes',
     })
 
-    const {setTitle} = useRootContext()
 
 
     function getData() {
@@ -44,7 +44,8 @@ const Other: React.FC = () => {
     }
 
     const onFinish = (value: any) => {
-        updateRealmByRealmId(realmId, convertDataFormToValue(value)).then(() => {
+        updateRealmByRealmId(realmId,
+            convertDataFormToValue(value)).then(() => {
             setFieldsChange(false)
         })
     }
@@ -63,7 +64,7 @@ const Other: React.FC = () => {
                 <Row gutter={12}>
                     <Col span={5}>
                         <Form.Item
-                            label={"Thời gian hiệu lực token"}
+                            label={"Thời gian hiệu lực other"}
                             name={"accessTokenLifespan"}
                         >
                             <InputNumber
