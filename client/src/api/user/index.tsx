@@ -26,6 +26,14 @@ export const getUserCredentialsById = async (realm: string | undefined,
     return response?.data
 }
 
+export const deleteUserCredentialById = async (
+    realm: string | undefined,
+    userId: string | undefined,
+    credentialId: string | null) => {
+    const response = await DP_axios.delete(`/admin/realms/${realm}/users/${userId}/credentials/${credentialId}`)
+    return response?.data
+}
+
 export const createUser = async (realm: string | undefined,
                                  data: object) => {
     const config: CustomAxiosRequestConfig = {captureLocationHeader: true}

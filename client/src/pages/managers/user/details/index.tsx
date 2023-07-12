@@ -43,7 +43,9 @@ export const Index: React.FC<{}> = props => {
                 </TabPane>
 
                 <TabPane key={"credentials"} tab={"Bảo mật"}>
-                    <UserCredentials/>
+                    <UserCredentials
+                        userData={userData}
+                    />
                 </TabPane>
 
                 {getMe().sub !== userId &&
