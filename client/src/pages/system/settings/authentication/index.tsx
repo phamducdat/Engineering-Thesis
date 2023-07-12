@@ -34,10 +34,11 @@ const Authentication: React.FC = () => {
         setFlag(false)
         getExecutionsByFlowAlias(alias).then((response) => {
             setNoDCX509Installed(false)
-            setDataSource(response?.filter((element: any) =>
+            const customData = response?.filter((element: any) =>
                 element.displayName === "X509/Validate Username Form"
                 || element.displayName === "DCX509 forms"
-            ))
+            )
+            setDataSource(customData)
             response.forEach((element: any) => {
 
                 if (element.displayName === "X509/Validate Username Form") {

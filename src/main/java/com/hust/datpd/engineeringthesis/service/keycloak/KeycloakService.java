@@ -7,7 +7,6 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.KeysMetadataRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -23,13 +22,11 @@ public class KeycloakService {
 
     @Value("${keycloak.username}")
     private String keycloakUsername;
-    private final ServerProperties serverProperties;
 
     private final KeycloakInstanceFactory keycloakInstanceFactory;
 
 
-    public KeycloakService(ServerProperties serverProperties, KeycloakInstanceFactory keycloakInstanceFactory) {
-        this.serverProperties = serverProperties;
+    public KeycloakService(KeycloakInstanceFactory keycloakInstanceFactory) {
         this.keycloakInstanceFactory = keycloakInstanceFactory;
     }
 

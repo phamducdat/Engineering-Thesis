@@ -4,6 +4,7 @@ import com.hust.datpd.engineeringthesis.dto.RealmSettingDto;
 import com.hust.datpd.engineeringthesis.entity.RealmSettingEntity;
 import com.hust.datpd.engineeringthesis.mapper.RealmSettingMapper;
 import com.hust.datpd.engineeringthesis.repository.RealmSettingRepository;
+import com.hust.datpd.engineeringthesis.service.keycloak.TwoAuthenticatorOTPKeycloakService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,10 +13,13 @@ import java.util.Optional;
 public class RealmSettingService {
 
     final RealmSettingRepository realmSettingRepository;
+
+    final TwoAuthenticatorOTPKeycloakService twoAuthenticatorOTPKeycloakService;
     final RealmSettingMapper mapper;
 
-    public RealmSettingService(RealmSettingRepository realmSettingRepository, RealmSettingMapper mapper) {
+    public RealmSettingService(RealmSettingRepository realmSettingRepository, TwoAuthenticatorOTPKeycloakService twoAuthenticatorOTPKeycloakService, RealmSettingMapper mapper) {
         this.realmSettingRepository = realmSettingRepository;
+        this.twoAuthenticatorOTPKeycloakService = twoAuthenticatorOTPKeycloakService;
         this.mapper = mapper;
     }
 
@@ -39,8 +43,18 @@ public class RealmSettingService {
         RealmSettingEntity entity;
         if (optionalRealmSettingEntity.isPresent()) {
             entity = optionalRealmSettingEntity.get();
+            if (!entity.isRequiredTwoAuthenticationOTP() && from.isRequiredTwoAuthenticationOTP()) {
+                twoAuthenticatorOTPKeycloakService.requiredTwoAuthenticatorOTP();
+            } else if (entity.isRequiredTwoAuthenticationOTP() && !from.isRequiredTwoAuthenticationOTP()) {
+                twoAuthenticatorOTPKeycloakService.disableTwoAuthenticatorOTP();
+            }
             entity = mapper.mapFromRealmSettingDto(from, entity);
         } else {
+            if (from.isRequiredTwoAuthenticationOTP()) {
+                twoAuthenticatorOTPKeycloakService.requiredTwoAuthenticatorOTP();
+            } else {
+                twoAuthenticatorOTPKeycloakService.disableTwoAuthenticatorOTP();
+            }
             entity = mapper.mapFromRealmSettingDto(from);
         }
         entity = realmSettingRepository.save(entity);

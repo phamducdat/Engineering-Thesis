@@ -17,8 +17,6 @@ const Settings: React.FC = () => {
                 <TabPane tab={"Khác"} key={"other"}>
                     <Other/>
                 </TabPane>
-
-
             </DP_Tabs>
         </div>
     );
