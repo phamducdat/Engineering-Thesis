@@ -8,7 +8,6 @@ import DP_Tabs from "../../../custom/data-display/tabs";
 import {filterClient} from "../../../custom/filter-client";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
 import TabPane = Tabs.TabPane;
-import {AlignType} from "rc-table/lib/interface";
 
 export const Domain: React.FC = () => {
 
@@ -70,7 +69,12 @@ export const Domain: React.FC = () => {
         {
             title: "Domain",
             dataIndex: "webOrigins",
-            key: "webOrigins"
+            key: "webOrigins",
+            render: (text: any) => {
+                return <a target="_blank" rel="noopener noreferrer" href={text[0]}>
+                    {text[0]}
+                </a>
+            }
         },
         {
             title: "",

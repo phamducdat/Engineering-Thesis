@@ -6,7 +6,7 @@ import {useParams} from "react-router-dom";
 import {useRootContext} from "../../../root/context/useRootContext";
 
 
-const Token: React.FC = () => {
+const Other: React.FC = () => {
 
     const {realmId} = useParams()
     const [form] = Form.useForm()
@@ -25,7 +25,7 @@ const Token: React.FC = () => {
     }
 
     useEffect(() => {
-        setTitle("Token")
+        setTitle("Cài đặt khác")
         getData();
     }, [])
 
@@ -110,4 +110,4 @@ const Token: React.FC = () => {
     );
 };
 
-export default Token;
+export default Other;

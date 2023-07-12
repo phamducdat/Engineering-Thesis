@@ -40,6 +40,16 @@ const DomainDetails: React.FC<{}> = (props) => {
         })
     }
 
+    const isValidURL = (inputURL: any) => {
+        try {
+            let url = new URL(inputURL);
+            return !(url.pathname !== '/' || url.search !== '' || url.hash !== '' || inputURL.endsWith('/'));
+
+        } catch (error) {
+            return false;
+        }
+    }
+
     return (
         <div>
             <DP_Tabs>
@@ -51,7 +61,7 @@ const DomainDetails: React.FC<{}> = (props) => {
                              }}
                     >
                         <Row>
-                            <Col span="6">
+                            <Col span="8">
                                 <Form.Item
                                     label={"Domain Id"}
                                     name={"clientId"}
@@ -68,7 +78,7 @@ const DomainDetails: React.FC<{}> = (props) => {
                         </Row>
 
                         <Row>
-                            <Col span="6">
+                            <Col span="8">
                                 <Form.Item
                                     label={"Đường dẫn:"}
                                     name={"url"}
@@ -76,7 +86,15 @@ const DomainDetails: React.FC<{}> = (props) => {
                                         {
                                             message: "Vui lòng nhập đường dẫn",
                                             required: true
-                                        }
+                                        },
+                                        () => ({
+                                            validator(_, value) {
+                                                if (isValidURL(value)) {
+                                                    return Promise.resolve();
+                                                }
+                                                return Promise.reject(new Error('Đường dẫn không đúng định dạng, ví dụ: http://example.com'));
+                                            },
+                                        })
                                     ]}
                                 >
                                     <Input/>
