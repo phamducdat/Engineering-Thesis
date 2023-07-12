@@ -14,6 +14,7 @@ export const CreateClient: React.FC<ModalProps> = props => {
     let navigate = useNavigate()
     const {setTitle} = useRootContext()
     const [isFormChanged, setIsFormChanged] = useState(false)
+    const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
@@ -21,11 +22,14 @@ export const CreateClient: React.FC<ModalProps> = props => {
     }, [])
 
     const onFinish = (value: any) => {
+        setLoading(true)
         createClient({
             ...value,
             "id": id,
         }).then((response) => {
             navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=details`)
+        }).finally(() => {
+            setLoading(false)
         })
     }
 
@@ -77,6 +81,7 @@ export const CreateClient: React.FC<ModalProps> = props => {
                     <Button type="primary"
                             htmlType="submit"
                             disabled={!isFormChanged}
+                            loading={loading}
                     >
                         Đồng ý
                     </Button>

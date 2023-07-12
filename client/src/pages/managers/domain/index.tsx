@@ -8,6 +8,7 @@ import DP_Tabs from "../../../custom/data-display/tabs";
 import {filterClient} from "../../../custom/filter-client";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
 import TabPane = Tabs.TabPane;
+import {AlignType} from "rc-table/lib/interface";
 
 export const Domain: React.FC = () => {
 
@@ -102,6 +103,7 @@ export const Domain: React.FC = () => {
                 tabBarExtraContent={
                     <>
                         <Button
+                            type={"primary"}
                             onClick={() => {
                                 navigate("add")
                             }}

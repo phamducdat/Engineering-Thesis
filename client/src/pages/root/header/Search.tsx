@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useSearchParams} from "react-router-dom";
+import React, {useEffect, useMemo, useState} from 'react';
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import {Input} from "antd";
 
 
@@ -7,6 +7,13 @@ const Search: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [value, setValue] = useState(searchParams.get("search") || "")
+    const location = useLocation()
+
+    useMemo(() => {
+        searchParams.delete('search')
+        setValue("")
+        navigate(location.pathname.toString())
+    }, [location.pathname])
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -21,7 +28,8 @@ const Search: React.FC = () => {
     }, [value, searchParams.get("search")])
     return (
         <Input.Search
-            value={value} placeholder="Tìm kiếm"
+            value={value}
+            placeholder="Tìm kiếm"
             allowClear={true}
             onChange={({target}) => setValue(target.value)}
         />);
