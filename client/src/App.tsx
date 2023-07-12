@@ -26,7 +26,6 @@ function App() {
                 refreshAccessToken().then(() => {
                 })
             })
-
     }, [])
 
     return (

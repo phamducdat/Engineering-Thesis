@@ -129,6 +129,7 @@ export const User: React.FC = () => {
         <>
             <DP_Tabs
                 tabBarExtraContent={<Button
+                    type={"primary"}
                     onClick={() => {
                         navigate("add")
                     }}

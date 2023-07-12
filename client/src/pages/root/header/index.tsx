@@ -1,59 +1,22 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {Header} from "antd/es/layout/layout";
-import {Avatar, Button, Col, Dropdown, Input, MenuProps, Row, Typography} from "antd";
-import {useNavigate, useParams, useSearchParams} from "react-router-dom";
+import {Avatar, Button, Col, Dropdown, MenuProps, Row, Typography} from "antd";
+import {useNavigate, useParams} from "react-router-dom";
 import {useRootContext} from "../context/useRootContext";
 import {getMe, logout} from "../../../api/admin";
+import Search from "./Search";
+import {getKeycloakUrl} from "../../../api/external";
 
 
 const DP_Header: React.FC<{}> = (props) => {
     let navigate = useNavigate()
     const {title} = useRootContext()
     const {realmId} = useParams()
-    const [searchParams] = useSearchParams()
-    const [searchValue, setSearchValue] = useState<string | undefined>(searchParams.get('search') ?? undefined)
-    let timeout: NodeJS.Timeout | null = null;
-    // const handleSearch = debounce((value: string) => {
-    //     console.log("dat with value = ", value)
-    //     if (value !== null && value !== undefined && value !== "") {
-    //         searchParams.set('search', value)
-    //     } else {
-    //         searchParams.delete('search')
-    //     }
-    //     navigate(`?${searchParams.toString()}`)
-    // }, 1000);
-
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {value} = e.target;
-        setSearchValue(value)
-        if (timeout) {
-            clearTimeout(timeout);
-        }
-
-        timeout = setTimeout(() => {
-            if (value !== null && value !== undefined && value !== "") {
-                searchParams.set('search', value)
-            } else {
-                searchParams.delete('search')
-            }
-            navigate(`?${searchParams.toString()}`)
-        }, 1000);
-    };
-
-    useEffect(() => {
-        setSearchValue(searchParams.get('search') ?? undefined)
-    }, [])
 
     useEffect(() => {
         document.title = title + " - DP"
     }, [title])
 
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const {value} = e.target;
-    //     setSearchValue(value)
-    //     handleSearch(value);
-    // };
 
     const items: MenuProps['items'] = [
         {
@@ -61,7 +24,10 @@ const DP_Header: React.FC<{}> = (props) => {
             label: <Button type={"text"}
                            onClick={() => {
                                logout(realmId).then((response) => {
-                                   navigate("/login")
+                                   localStorage.clear()
+                                   getKeycloakUrl().then(() => {
+                                       navigate("/login")
+                                   })
                                })
                            }}
             >
@@ -85,12 +51,7 @@ const DP_Header: React.FC<{}> = (props) => {
                     <Col span={6}
                          style={{marginTop: "16px"}}
                     >
-                        <Input.Search
-                            placeholder={"Tìm kiếm"}
-                            value={searchValue}
-                            onChange={handleChange}
-                            allowClear
-                        />
+                        <Search/>
                     </Col>
 
                     <Col>

@@ -1,29 +1,68 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import {getUserCredentialsById, resetPassword} from "../../../../api/user";
+import {deleteUserCredentialById, getUserCredentialsById, resetPassword} from "../../../../api/user";
 import {DP_Form} from "../../../../custom/data-entry/form";
-import {Button, Col, Form, Input, Row, Switch} from "antd";
+import {Button, Col, Form, Input, Modal, Row, Switch} from "antd";
+import {ExclamationCircleOutlined} from "@ant-design/icons";
+
+interface UserCredentialsProps {
+    userData: any; // Update the type 'any' to the appropriate type for your userData
+}
 
 
-const UserCredentials: React.FC = () => {
+const UserCredentials: React.FC<UserCredentialsProps> = props => {
     const {realmId, userId} = useParams();
+    const [passwordCredentialId, setPasswordCredentialId] = useState(null)
+    const [isFormChanged, setIsFormChanged] = useState(false)
+    const [form] = Form.useForm()
+    const userData = props.userData
+
+    function getData() {
+        form.resetFields()
+        setIsFormChanged(false)
+        setPasswordCredentialId(null)
+        getUserCredentialsById(realmId, userId).then((response: any) => {
+            if (response.length > 0) {
+                const isHasBeenSet = response.filter((element: any) => element.type === 'password')
+                setPasswordCredentialId(isHasBeenSet[0].id)
+            }
+        })
+    }
 
     useEffect(() => {
-        getUserCredentialsById(realmId, userId).then((response) => {
-        })
+        getData();
     }, [])
 
+
+    const handleOnDeletePassword = () => {
+        Modal.confirm({
+            title: "Bạn có chắn chắn muốn xóa mật khẩu của tài khoản: " + userData.username,
+            icon: <ExclamationCircleOutlined/>,
+            onOk: () => {
+                deleteUserCredentialById(realmId, userId, passwordCredentialId).then(() => {
+                    getData()
+                })
+            }
+        })
+    }
 
     const onFinish = (value: any) => {
         delete value.confirm
         resetPassword(realmId, userId, value).then(() => {
+            getData()
         })
     }
 
 
     return (
         <div>
-            <DP_Form onFinish={onFinish}>
+            <DP_Form
+                form={form}
+                onFinish={onFinish}
+                onFieldsChange={() => {
+                    setIsFormChanged(true)
+                }}
+            >
                 <Row>
                     <Col span={6}>
                         <Form.Item
@@ -36,7 +75,9 @@ const UserCredentials: React.FC = () => {
                                 }
                             ]}
                         >
-                            <Input.Password/>
+                            <Input.Password
+                                placeholder={passwordCredentialId ? "************" : "Nhập mật khẩu"}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -63,7 +104,10 @@ const UserCredentials: React.FC = () => {
                                 }),
                             ]}
                         >
-                            <Input.Password/>
+                            <Input.Password
+                                placeholder={passwordCredentialId ? "************" : "Nhập lại mật khẩu"}
+
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -76,11 +120,31 @@ const UserCredentials: React.FC = () => {
                     <Switch/>
                 </Form.Item>
 
-                <Form.Item wrapperCol={{span: 4}}>
-                    <Button type="primary" htmlType="submit">
-                        Đặt lại mật khẩu
-                    </Button>
-                </Form.Item>
+                <Col span={6}>
+                    <Row gutter={24} justify={"space-between"}>
+                        <Col>
+                            <Form.Item wrapperCol={{span: 4}}>
+                                <Button type="primary"
+                                        htmlType="submit"
+                                        disabled={!isFormChanged}
+                                >
+                                    Thiết lập mật khẩu
+                                </Button>
+                            </Form.Item>
+                        </Col>
+
+                        <Col>
+                            <Form.Item wrapperCol={{span: 4}}>
+                                <Button danger
+                                        disabled={!passwordCredentialId}
+                                        onClick={handleOnDeletePassword}
+                                >
+                                    Xóa mật khẩu
+                                </Button>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Col>
             </DP_Form>
         </div>
     );

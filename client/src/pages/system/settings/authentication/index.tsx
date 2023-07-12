@@ -39,6 +39,7 @@ const Authentication: React.FC = () => {
                 || element.displayName === "DCX509 forms"
             ))
             response.forEach((element: any) => {
+
                 if (element.displayName === "X509/Validate Username Form") {
                     getConfigAuthenticationById(element.authenticationConfig).then((response) => {
                         setConfigAuthData(response)

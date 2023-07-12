@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Form, Input, message, Row} from "antd";
+import {Button, Card, Form, Input, Row} from "antd";
 import {useNavigate} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import {loginAdminAccount} from "../../api/external";
@@ -18,7 +18,6 @@ export const Login: React.FC = () => {
 
         setLoading(true)
 
-
         loginAdminAccount(values).then((response) => {
             if (response) {
                 localStorage.setItem("access_token", response?.access_token)
@@ -26,8 +25,6 @@ export const Login: React.FC = () => {
                 localStorage.setItem("token_type", response?.token_type)
                 navigate(`/realm/master/managers/domain`)
             }
-        }).catch(error => {
-            message.warning(error.response.data.errorMessage)
         }).finally(() => {
             setLoading(false)
         })
@@ -109,7 +106,6 @@ export const Login: React.FC = () => {
 
                     </Row>
                 </Form>
-
 
 
             </Card>

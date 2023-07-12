@@ -12,6 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin("*")
 @RestController
@@ -46,6 +50,8 @@ public class KeycloakController {
     @PostMapping("/login")
     public ResponseEntity<?> getAdminKeycloakToken(@RequestBody
                                                    AdminKeycloakDto from) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String uiUrl = request.getHeader("referer");
         if (!validatorUtil.adminKeycloakValid(from.getUsername(),
                 from.getPassword()))
             return ResponseEntity.status(
@@ -53,7 +59,7 @@ public class KeycloakController {
             ).body(
                     new ErrorResponse("Tài khoản hoặc mật khẩu không hợp lệ")
             );
-        return ResponseEntity.ok(keycloakService.getAdminKeycloakAccessToken());
+        return ResponseEntity.ok(keycloakService.getAdminKeycloakAccessToken(uiUrl));
 
     }
 

@@ -177,7 +177,7 @@ public class ValidatorUtil {
                 String sub = jsonNode.get("sub").asText();
                 boolean emailVerified = jsonNode.get("email_verified").asBoolean();
                 String preferredUsername = jsonNode.get("preferred_username").asText();
-                return Objects.equals(preferredUsername, "admin");
+                return Objects.equals(preferredUsername, keycloakUsername);
             } else {
                 System.out.println("Request failed with status code: " + response.getStatusCodeValue());
                 return false;

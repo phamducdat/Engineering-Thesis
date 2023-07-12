@@ -69,7 +69,12 @@ export const Domain: React.FC = () => {
         {
             title: "Domain",
             dataIndex: "webOrigins",
-            key: "webOrigins"
+            key: "webOrigins",
+            render: (text: any) => {
+                return <a target="_blank" rel="noopener noreferrer" href={text[0]}>
+                    {text[0]}
+                </a>
+            }
         },
         {
             title: "",
@@ -102,6 +107,7 @@ export const Domain: React.FC = () => {
                 tabBarExtraContent={
                     <>
                         <Button
+                            type={"primary"}
                             onClick={() => {
                                 navigate("add")
                             }}

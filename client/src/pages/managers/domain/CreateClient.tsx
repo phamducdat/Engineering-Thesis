@@ -1,5 +1,5 @@
-import {Button, Col, Form, Input, ModalProps, Row} from "antd";
-import React, {useEffect} from "react";
+import {Button, Col, Form, Input, message, ModalProps, Row} from "antd";
+import React, {useEffect, useState} from "react";
 import {DP_Form} from "../../../custom/data-entry/form";
 import {useNavigate, useParams} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
@@ -13,6 +13,8 @@ export const CreateClient: React.FC<ModalProps> = props => {
     const id = uuid()
     let navigate = useNavigate()
     const {setTitle} = useRootContext()
+    const [isFormChanged, setIsFormChanged] = useState(false)
+    const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
@@ -20,12 +22,24 @@ export const CreateClient: React.FC<ModalProps> = props => {
     }, [])
 
     const onFinish = (value: any) => {
+        setLoading(true)
         createClient({
             ...value,
             "id": id,
         }).then((response) => {
-            navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=permissions`)
+            message.success("Tạo mới thành công")
+            navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=details`)
         })
+    }
+
+    const isValidURL = (inputURL: any) => {
+        try {
+            let url = new URL(inputURL);
+            return !(url.pathname !== '/' || url.search !== '' || url.hash !== '' || inputURL.endsWith('/'));
+
+        } catch (error) {
+            return false;
+        }
     }
 
 
@@ -34,6 +48,9 @@ export const CreateClient: React.FC<ModalProps> = props => {
             <DP_Form
                 form={form}
                 onFinish={onFinish}
+                onFieldsChange={() => {
+                    setIsFormChanged(true)
+                }}
             >
                 <Row>
                     <Col span={8}>
@@ -61,7 +78,15 @@ export const CreateClient: React.FC<ModalProps> = props => {
                                 {
                                     message: "Vui lòng nhập đường dẫn",
                                     required: true
-                                }
+                                },
+                                () => ({
+                                    validator(_, value) {
+                                        if (isValidURL(value)) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('Đường dẫn không đúng định dạng, ví dụ: http://example.com'));
+                                    },
+                                }),
                             ]}
                         >
                             <Input/>
@@ -70,7 +95,11 @@ export const CreateClient: React.FC<ModalProps> = props => {
                 </Row>
 
                 <Form.Item wrapperCol={{span: 4}}>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary"
+                            htmlType="submit"
+                            disabled={!isFormChanged}
+                            loading={loading}
+                    >
                         Đồng ý
                     </Button>
                 </Form.Item>

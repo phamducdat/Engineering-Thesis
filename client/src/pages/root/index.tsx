@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Layout, Spin} from 'antd';
 import DP_Sider from "./sider";
 import DP_Header from "./header";
-import {Outlet} from "react-router-dom";
+import {Outlet, useLocation, useNavigate, useSearchParams} from "react-router-dom";
 import {RootContext} from "./context/root-context";
 
 const {Header, Content, Footer} = Layout;
@@ -12,6 +12,7 @@ const RootPage: React.FC = () => {
     const [title, setTitle] = useState("Title");
     const [reloadData, setReloadData] = useState(null)
     const [spinning, setSpinning] = useState(false)
+
 
 
     return (
@@ -36,7 +37,7 @@ const RootPage: React.FC = () => {
                                 overflow: "auto",
                                 background: "white",
                                 borderRadius: "8px",
-                                height:"85vh"
+                                height: "85vh"
                             }}
                         >
                             <Outlet/>

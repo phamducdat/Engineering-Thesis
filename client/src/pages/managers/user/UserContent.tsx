@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {DP_Form} from "../../../custom/data-entry/form";
 import {Button, Col, Form, FormProps, Input, Row, Switch} from "antd";
 
@@ -16,9 +16,11 @@ interface UserContentProps extends FormProps {
 export const UserContent: React.FC<UserContentProps> = props => {
 
     const [form] = Form.useForm()
+    const [isFormChanged, setIsFormChanged] = useState(false)
 
 
     useEffect(() => {
+        setIsFormChanged(false)
         form.setFieldsValue(props.userData)
     }, [form, props.userData])
 
@@ -27,6 +29,9 @@ export const UserContent: React.FC<UserContentProps> = props => {
             <DP_Form
                 {...props}
                 form={form}
+                onFieldsChange={() => {
+                    setIsFormChanged(true)
+                }}
             >
 
                 {props.mode === mode.Update && <Row>
@@ -98,7 +103,9 @@ export const UserContent: React.FC<UserContentProps> = props => {
                 </Row>
 
                 <Form.Item wrapperCol={{span: 4}}>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary" htmlType="submit"
+                            disabled={!isFormChanged}
+                    >
                         Đồng ý
                     </Button>
                 </Form.Item>
