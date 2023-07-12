@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {getUserCredentialsById, resetPassword} from "../../../../api/user";
 import {DP_Form} from "../../../../custom/data-entry/form";
@@ -7,9 +7,14 @@ import {Button, Col, Form, Input, Row, Switch} from "antd";
 
 const UserCredentials: React.FC = () => {
     const {realmId, userId} = useParams();
+    const [passwordHasBeenSet, setPasswordHasBeenSet] = useState(false)
 
     useEffect(() => {
-        getUserCredentialsById(realmId, userId).then((response) => {
+        getUserCredentialsById(realmId, userId).then((response: any) => {
+            if (response.length > 0) {
+                const isHasBeenSet = response.filter((element: any) => element.type === 'password')
+                setPasswordHasBeenSet(isHasBeenSet !== null && isHasBeenSet !== undefined)
+            }
         })
     }, [])
 
@@ -36,7 +41,9 @@ const UserCredentials: React.FC = () => {
                                 }
                             ]}
                         >
-                            <Input.Password/>
+                            <Input.Password
+                                placeholder={passwordHasBeenSet ? "************" : "Nhập mật khẩu"}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -63,7 +70,10 @@ const UserCredentials: React.FC = () => {
                                 }),
                             ]}
                         >
-                            <Input.Password/>
+                            <Input.Password
+                                placeholder={passwordHasBeenSet ? "************" : "Nhập lại mật khẩu"}
+
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
