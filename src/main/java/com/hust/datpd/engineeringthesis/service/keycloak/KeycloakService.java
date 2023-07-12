@@ -56,6 +56,10 @@ public class KeycloakService {
             return Objects.equals(element.getUsername(), keycloakUsername);
         }).findFirst();
 
+        if (to.isPresent()) {
+            UserRepresentation user = to.get();
+        }
+
         return to.orElse(null);
     }
 

@@ -7,21 +7,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class RealmSettingMapper {
 
+
+    public RealmSettingEntity mapFromRealmSettingDto(
+            RealmSettingDto from, RealmSettingEntity to
+    ) {
+        to.setRequiredTwoAuthenticationOTP(from.isRequiredTwoAuthenticationOTP());
+        return to;
+    }
+
     public RealmSettingEntity mapFromRealmSettingDto(
             RealmSettingDto from
     ) {
         RealmSettingEntity to = new RealmSettingEntity();
-        to.setRealmId(from.getRealmId());
-        to.setDefaultPassword(from.getDefaultPassword());
-
+        to.setId(0L);
+        to.setRequiredTwoAuthenticationOTP(from.isRequiredTwoAuthenticationOTP());
         return to;
     }
 
 
     public RealmSettingDto mapFromRealmSettingEntity(RealmSettingEntity from) {
         RealmSettingDto to = new RealmSettingDto();
-        to.setRealmId(from.getRealmId());
-        to.setDefaultPassword(from.getDefaultPassword());
+        to.setRequiredTwoAuthenticationOTP(from.isRequiredTwoAuthenticationOTP());
 
         return to;
     }
