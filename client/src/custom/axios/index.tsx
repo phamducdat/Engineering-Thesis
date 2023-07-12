@@ -14,13 +14,91 @@ export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
     }
 }
 
-const DP_axios = axios.create({
-    baseURL: localStorage.getItem("keycloakUrl") || undefined,
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem("access_token")}`
-    },
-});
+
+const createCustomAxios = (baseURL: any) => {
+    const instance = axios.create({
+        baseURL: baseURL || undefined,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+        },
+    });
+
+    instance.interceptors.request.use(
+        async (config) => {
+            const token = await refreshAccessToken();
+            config.baseURL = baseURL || undefined;
+            config.headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            } as any;
+            return config;
+        },
+        (error) => Promise.reject(error),
+    );
+
+    instance.interceptors.response.use(
+        (response) => {
+            const config = response?.config as CustomAxiosRequestConfig;
+            if (config.disableMessage == undefined || !config.disableMessage) {
+                if (config.customMessage) {
+                    if (config.customMessage.type === "success") {
+                        message.success(config.customMessage.message)
+                    }
+
+                    if (config.customMessage.type === "warning") {
+                        message.warning(config.customMessage.message)
+                    }
+                    if (config.customMessage.type === "error") {
+                        message.error(config.customMessage.message)
+                    }
+
+                } else if (config.method !== "get") {
+                    if (config.method === "post")
+                        message.success("Tạo mới thành công")
+                    if (config.method === "put")
+                        message.success("Cập nhật thành công")
+                    if (config.method === "delete")
+                        message.success("Xóa thành công")
+                }
+            }
+            if (config.captureLocationHeader) {
+                response.data = {
+                    ...response.data,
+                    location: response.headers.location,
+                };
+            }
+            return response;
+        },
+        async (error) => {
+            const originalRequest = error.config;
+            const config = error?.config as CustomAxiosRequestConfig;
+
+            if (error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                try {
+                    const newToken = await refreshAccessToken();
+
+                    originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                    return DP_keycloakAxios(originalRequest);
+                } catch (e) {
+                    // Make sure to throw this error so it gets handled upstream
+                    throw e;
+                }
+            } else {
+                if (config.disableMessage == undefined || !config.disableMessage) {
+                    message.warning(convertWarningMessage(error.response?.data.errorMessage))
+                }
+            }
+
+            // Unhandled error, throw it to make sure it gets caught somewhere
+            throw error;
+        }
+    );
+
+    return instance;
+}
+
 
 export const refreshAccessToken = async () => {
     const data = {
@@ -53,76 +131,6 @@ export const refreshAccessToken = async () => {
     }
 }
 
-DP_axios.interceptors.request.use(
-    async (config) => {
-        const token = await refreshAccessToken();
-        config.baseURL = localStorage.getItem("keycloakUrl") || undefined;
-        config.headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        } as any;
-        return config;
-    },
-    (error) => Promise.reject(error),
-);
+export const DP_keycloakAxios = createCustomAxios(localStorage.getItem("keycloakUrl"));
 
-
-DP_axios.interceptors.response.use(
-    (response) => {
-        const config = response?.config as CustomAxiosRequestConfig;
-        if (config.disableMessage == undefined || !config.disableMessage) {
-            if (config.customMessage) {
-                if (config.customMessage.type === "success") {
-                    message.success(config.customMessage.message)
-                }
-
-                if (config.customMessage.type === "warning") {
-                    message.warning(config.customMessage.message)
-                }
-                if (config.customMessage.type === "error") {
-                    message.error(config.customMessage.message)
-                }
-
-            } else if (config.method !== "get") {
-                if (config.method === "post")
-                    message.success("Tạo mới thành công")
-                if (config.method === "put")
-                    message.success("Cập nhật thành công")
-                if (config.method === "delete")
-                    message.success("Xóa thành công")
-            }
-        }
-        if (config.captureLocationHeader) {
-            response.data = {
-                ...response.data,
-                location: response.headers.location,
-            };
-        }
-        return response;
-    },
-    async (error) => {
-        const originalRequest = error.config;
-        const config = error?.config as CustomAxiosRequestConfig;
-
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            try {
-                const newToken = await refreshAccessToken();
-
-                originalRequest.headers.Authorization = `Bearer ${newToken}`;
-                return DP_axios(originalRequest);
-            } catch (e) {
-                // Make sure to throw this error so it gets handled upstream
-                throw e;
-            }
-        } else {
-            if (config.disableMessage == undefined || !config.disableMessage) {
-                    message.warning(convertWarningMessage(error.response?.data.errorMessage))
-            }
-        }
-
-        // Unhandled error, throw it to make sure it gets caught somewhere
-        throw error;
-    }
-)
-export default DP_axios
+export const DP_externalServerAxios = createCustomAxios(process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL);

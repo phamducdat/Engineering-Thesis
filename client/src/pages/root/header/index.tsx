@@ -5,6 +5,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useRootContext} from "../context/useRootContext";
 import {getMe, logout} from "../../../api/admin";
 import Search from "./Search";
+import {getKeycloakUrl} from "../../../api/external";
 
 
 const DP_Header: React.FC<{}> = (props) => {
@@ -24,7 +25,9 @@ const DP_Header: React.FC<{}> = (props) => {
                            onClick={() => {
                                logout(realmId).then((response) => {
                                    localStorage.clear()
-                                   navigate("/login")
+                                   getKeycloakUrl().then(() => {
+                                       navigate("/login")
+                                   })
                                })
                            }}
             >

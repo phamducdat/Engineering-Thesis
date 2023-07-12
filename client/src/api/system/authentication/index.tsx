@@ -1,8 +1,8 @@
-import DP_axios, {CustomAxiosRequestConfig} from "../../../custom/axios";
+import {CustomAxiosRequestConfig, DP_keycloakAxios } from "../../../custom/axios"
 
 export const copyBrowserAuthentication = async (newName: string) => {
     const config: CustomAxiosRequestConfig = {disableMessage: true}
-    const response = await DP_axios.post("/admin/realms/master/authentication/flows/browser/copy", {
+    const response = await DP_keycloakAxios.post("/admin/realms/master/authentication/flows/browser/copy", {
         newName: newName
     }, config)
     return response.data || []
@@ -10,14 +10,14 @@ export const copyBrowserAuthentication = async (newName: string) => {
 
 export const getExecutionsByFlowAlias = async (flowAlias: string) => {
     const config: CustomAxiosRequestConfig = {disableMessage: true}
-    const response = await DP_axios.get(`/admin/realms/master/authentication/flows/${flowAlias}/executions`, config)
+    const response = await DP_keycloakAxios.get(`/admin/realms/master/authentication/flows/${flowAlias}/executions`, config)
     return response.data || []
 }
 
 
 export const addExecution = async (newName: string) => {
     const config: CustomAxiosRequestConfig = {captureLocationHeader: true, disableMessage: true}
-    const response = await DP_axios.post(`/admin/realms/master/authentication/flows/${newName}/executions/execution`, {
+    const response = await DP_keycloakAxios.post(`/admin/realms/master/authentication/flows/${newName}/executions/execution`, {
         provider: "auth-x509-client-username-form"
     }, config)
     return response.data || []
@@ -31,7 +31,7 @@ export const raisePriorityExecution = async (executionId: string) => {
             message: "Cập nhật thành công"
         }
     }
-    const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/raise-priority`,
+    const response = await DP_keycloakAxios.post(`/admin/realms/master/authentication/executions/${executionId}/raise-priority`,
         {"realm": "master", "execution": executionId}, config)
     return response.data || []
 }
@@ -43,18 +43,18 @@ export const lowerPriorityExecution = async (executionId: string) => {
             message: "Cập nhật thành công"
         }
     }
-    const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/lower-priority`,
+    const response = await DP_keycloakAxios.post(`/admin/realms/master/authentication/executions/${executionId}/lower-priority`,
         {"realm": "master", "execution": executionId}, config)
     return response.data || []
 }
 
 export const getExecutionById = async (executionId: string) => {
-    const response = await DP_axios.get(`/admin/realms/master/authentication/executions/${executionId}`)
+    const response = await DP_keycloakAxios.get(`/admin/realms/master/authentication/executions/${executionId}`)
     return response.data || []
 }
 
 export const getConfigAuthenticationById = async (authenticationId: string) => {
-    const response = await DP_axios.get(`/admin/realms/master/authentication/config/${authenticationId}`)
+    const response = await DP_keycloakAxios.get(`/admin/realms/master/authentication/config/${authenticationId}`)
     return response.data || []
 
 }
@@ -62,7 +62,7 @@ export const getConfigAuthenticationById = async (authenticationId: string) => {
 export const createConfigAuthentication = async (executionId: string,
                                                  configAlias: string) => {
     const config: CustomAxiosRequestConfig = {captureLocationHeader: true, disableMessage: true}
-    const response = await DP_axios.post(`/admin/realms/master/authentication/executions/${executionId}/config`,
+    const response = await DP_keycloakAxios.post(`/admin/realms/master/authentication/executions/${executionId}/config`,
         {
             "config": {
                 "x509-cert-auth.mapping-source-selection": "Subject's e-mail",
@@ -87,7 +87,7 @@ export const createConfigAuthentication = async (executionId: string,
 
 export const updateConfigAuthentication = async (configId: string,
                                                  data:any) => {
-    const response = await DP_axios.put(`/admin/realms/master/authentication/config/${configId}`,
+    const response = await DP_keycloakAxios.put(`/admin/realms/master/authentication/config/${configId}`,
         data)
     return response.data || []
 }
@@ -98,7 +98,7 @@ export const updateExecutionById = async (flowName: string,
                                           disableMessage: boolean = false
 ) => {
     const config: CustomAxiosRequestConfig = {disableMessage: disableMessage}
-    const response = await DP_axios.put(`/admin/realms/master/authentication/flows/${flowName}/executions`, {
+    const response = await DP_keycloakAxios.put(`/admin/realms/master/authentication/flows/${flowName}/executions`, {
         id: executionId,
         requirement: requirement
     }, config)

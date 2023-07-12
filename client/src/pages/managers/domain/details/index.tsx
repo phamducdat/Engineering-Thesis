@@ -18,6 +18,7 @@ const DomainDetails: React.FC<{}> = (props) => {
     const {setTitle} = useRootContext()
     const [form] = Form.useForm()
     const [isFormChanged, setIsFormChanged] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     function getDomainData() {
         setIsFormChanged(false)
@@ -35,9 +36,14 @@ const DomainDetails: React.FC<{}> = (props) => {
     }, [])
 
     const onFinish = (value: any) => {
+        setLoading(true)
         updateClient(domainId, value).then((response) => {
             getDomainData();
+            setLoading(false)
+        }).finally(() => {
+            setLoading(false)
         })
+
     }
 
     const isValidURL = (inputURL: any) => {
@@ -106,6 +112,7 @@ const DomainDetails: React.FC<{}> = (props) => {
                                 type="primary"
                                 htmlType="submit"
                                 disabled={!isFormChanged}
+                                loading={loading}
                             >
                                 Đồng ý
                             </Button>
