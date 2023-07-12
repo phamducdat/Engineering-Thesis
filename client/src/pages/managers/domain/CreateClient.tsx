@@ -1,5 +1,5 @@
 import {Button, Col, Form, Input, ModalProps, Row} from "antd";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {DP_Form} from "../../../custom/data-entry/form";
 import {useNavigate, useParams} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
@@ -13,6 +13,7 @@ export const CreateClient: React.FC<ModalProps> = props => {
     const id = uuid()
     let navigate = useNavigate()
     const {setTitle} = useRootContext()
+    const [isFormChanged, setIsFormChanged] = useState(false)
 
 
     useEffect(() => {
@@ -24,7 +25,7 @@ export const CreateClient: React.FC<ModalProps> = props => {
             ...value,
             "id": id,
         }).then((response) => {
-            navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=permissions`)
+            navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=details`)
         })
     }
 
@@ -34,6 +35,9 @@ export const CreateClient: React.FC<ModalProps> = props => {
             <DP_Form
                 form={form}
                 onFinish={onFinish}
+                onFieldsChange={() => {
+                    setIsFormChanged(true)
+                }}
             >
                 <Row>
                     <Col span={8}>
@@ -70,7 +74,10 @@ export const CreateClient: React.FC<ModalProps> = props => {
                 </Row>
 
                 <Form.Item wrapperCol={{span: 4}}>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary"
+                            htmlType="submit"
+                            disabled={!isFormChanged}
+                    >
                         Đồng ý
                     </Button>
                 </Form.Item>

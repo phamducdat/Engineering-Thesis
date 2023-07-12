@@ -18,16 +18,20 @@ export const Index: React.FC<{}> = props => {
     const [userData, setUserData] = useState()
 
 
-    useEffect(() => {
+    function getUserData() {
         getUserById(realmId, userId).then((response) => {
             setUserData(response)
             setTitle(`Thông tin nhân sự: ${response?.username}`)
         })
+    }
+
+    useEffect(() => {
+        getUserData();
     }, [userId])
 
     const onFinish = (value: object) => {
         updateUser(realmId, userId, value).then((response) => {
-
+            getUserData()
         })
     }
 

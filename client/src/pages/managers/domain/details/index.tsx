@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {getClientById} from "../../../../api/clients";
 import {Button, Col, Form, Input, Row, Tabs} from "antd";
@@ -8,8 +8,8 @@ import DP_Tabs from "../../../../custom/data-display/tabs";
 import UserSession from "./UserSession";
 import Revocation from "./Revocation";
 import {PermissionTransfer} from "./PermissionTransfer";
-import TabPane = Tabs.TabPane;
 import {updateClient} from "../../../../api/external";
+import TabPane = Tabs.TabPane;
 
 
 const DomainDetails: React.FC<{}> = (props) => {
@@ -17,20 +17,26 @@ const DomainDetails: React.FC<{}> = (props) => {
     const {realmId, domainId} = useParams()
     const {setTitle} = useRootContext()
     const [form] = Form.useForm()
-    useEffect(() => {
+    const [isFormChanged, setIsFormChanged] = useState(false)
+
+    function getDomainData() {
+        setIsFormChanged(false)
         getClientById(realmId, domainId).then((response) => {
             form.setFieldsValue({
                 ...response,
-                url:response?.webOrigins[0]
+                url: response?.webOrigins[0]
             })
             setTitle(`Thông tin domain: ${response?.clientId}`)
         })
+    }
 
-
+    useEffect(() => {
+        getDomainData();
     }, [])
 
     const onFinish = (value: any) => {
         updateClient(domainId, value).then((response) => {
+            getDomainData();
         })
     }
 
@@ -40,6 +46,9 @@ const DomainDetails: React.FC<{}> = (props) => {
                 <TabPane key={"details"} tab={"Chi tiết"}>
                     <DP_Form form={form}
                              onFinish={onFinish}
+                             onFieldsChange={() => {
+                                 setIsFormChanged(true)
+                             }}
                     >
                         <Row>
                             <Col span="6">
@@ -75,15 +84,16 @@ const DomainDetails: React.FC<{}> = (props) => {
                             </Col>
                         </Row>
                         <Form.Item wrapperCol={{span: 4}}>
-                            <Button type="primary" htmlType="submit">
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                disabled={!isFormChanged}
+                            >
                                 Đồng ý
                             </Button>
                         </Form.Item>
                     </DP_Form>
                 </TabPane>
-                {/*<TabPane key={"installation"} tab={"Cài đặt"}>*/}
-                {/*    <Installation/>*/}
-                {/*</TabPane>*/}
 
                 <TabPane key="permissions" tab="Phân quyền">
                     <PermissionTransfer/>

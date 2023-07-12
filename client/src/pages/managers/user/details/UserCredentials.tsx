@@ -13,9 +13,13 @@ interface UserCredentialsProps {
 const UserCredentials: React.FC<UserCredentialsProps> = props => {
     const {realmId, userId} = useParams();
     const [passwordCredentialId, setPasswordCredentialId] = useState(null)
+    const [isFormChanged, setIsFormChanged] = useState(false)
+    const [form] = Form.useForm()
     const userData = props.userData
 
     function getData() {
+        form.resetFields()
+        setIsFormChanged(false)
         setPasswordCredentialId(null)
         getUserCredentialsById(realmId, userId).then((response: any) => {
             if (response.length > 0) {
@@ -52,7 +56,13 @@ const UserCredentials: React.FC<UserCredentialsProps> = props => {
 
     return (
         <div>
-            <DP_Form onFinish={onFinish}>
+            <DP_Form
+                form={form}
+                onFinish={onFinish}
+                onFieldsChange={() => {
+                    setIsFormChanged(true)
+                }}
+            >
                 <Row>
                     <Col span={6}>
                         <Form.Item
@@ -114,8 +124,11 @@ const UserCredentials: React.FC<UserCredentialsProps> = props => {
                     <Row gutter={24} justify={"space-between"}>
                         <Col>
                             <Form.Item wrapperCol={{span: 4}}>
-                                <Button type="primary" htmlType="submit">
-                                    Đặt lại mật khẩu
+                                <Button type="primary"
+                                        htmlType="submit"
+                                        disabled={!isFormChanged}
+                                >
+                                    Thiết lập mật khẩu
                                 </Button>
                             </Form.Item>
                         </Col>
