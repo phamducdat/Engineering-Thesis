@@ -5,8 +5,8 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.KeysMetadataRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -19,13 +19,14 @@ public class KeycloakService {
 
     @Value("${keycloak.realm}")
     private String keycloakRealm;
-    private final ServerProperties serverProperties;
+
+    @Value("${keycloak.username}")
+    private String keycloakUsername;
 
     private final KeycloakInstanceFactory keycloakInstanceFactory;
 
 
-    public KeycloakService(ServerProperties serverProperties, KeycloakInstanceFactory keycloakInstanceFactory) {
-        this.serverProperties = serverProperties;
+    public KeycloakService(KeycloakInstanceFactory keycloakInstanceFactory) {
         this.keycloakInstanceFactory = keycloakInstanceFactory;
     }
 
@@ -40,6 +41,23 @@ public class KeycloakService {
         addWebOriginToAdminCli(keycloakRealm, externalServerURL);
         return to;
 
+    }
+
+    public UserRepresentation getAdminAccount() {
+        Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
+
+        List<UserRepresentation> userRepresentations =
+                keycloak.realm(keycloakRealm).users().list();
+
+        Optional<UserRepresentation> to = userRepresentations.stream().filter(element -> {
+            return Objects.equals(element.getUsername(), keycloakUsername);
+        }).findFirst();
+
+        if (to.isPresent()) {
+            UserRepresentation user = to.get();
+        }
+
+        return to.orElse(null);
     }
 
     public String getPublicKey(String realmName) {

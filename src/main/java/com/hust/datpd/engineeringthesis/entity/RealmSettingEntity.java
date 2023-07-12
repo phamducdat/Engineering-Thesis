@@ -16,9 +16,9 @@ import javax.persistence.Table;
 public class RealmSettingEntity {
 
     @Id
-    private String realmId;
+    private Long id;
 
-    @Column(name = "default_password")
-    private String defaultPassword;
+    @Column(name = "required_two_authentication_otp")
+    private boolean requiredTwoAuthenticationOTP;
 
 }

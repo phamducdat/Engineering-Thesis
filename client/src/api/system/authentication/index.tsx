@@ -104,3 +104,9 @@ export const updateExecutionById = async (flowName: string,
     }, config)
     return response.data || []
 }
+
+export const updateConfigOTP = async (data: any) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: true}
+    const response = await DP_keycloakAxios.put(`/admin/realms/master/authentication/required-actions/CONFIGURE_TOTP`, data, config)
+    return response.data || []
+}

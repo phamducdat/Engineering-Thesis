@@ -31,11 +31,15 @@ export const updateClient = async (id: string | undefined, data: any) => {
 }
 
 
-export const registration = async (data: any) => {
-    const response = await DP_externalServerAxios.post(`${baseExternalUrl}/registrations`, data)
+export const getRealmSetting = async (id: string | undefined) => {
+    const response = await DP_externalServerAxios.get(`${baseExternalUrl}/admin/realms/${id}/settings`)
     return response?.data || []
 }
 
+export const updateRealmSetting = async (id: string | undefined, data: any) => {
+    const response = await DP_externalServerAxios.put(`${baseExternalUrl}/admin/realms/${id}/settings`, data)
+    return response?.data || []
+}
 
 export const getKeycloakUrl = async () => {
     const response = await axios.get(`${baseExternalUrl}/admin/keycloak/info`)

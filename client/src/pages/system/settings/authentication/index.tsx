@@ -8,14 +8,16 @@ import {
     lowerPriorityExecution,
     raisePriorityExecution,
     updateConfigAuthentication,
+    updateConfigOTP,
     updateExecutionById
 } from "../../../../api/system/authentication";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {DP_Table} from "../../../../custom/data-display/table";
-import {Button, Checkbox, Col, message, Row, Select, Space} from "antd";
+import {Button, Checkbox, Col, message, Row, Select, Space, Switch} from "antd";
 import {DownOutlined, UpOutlined} from "@ant-design/icons";
 import {CheckboxChangeEvent} from "antd/es/checkbox";
 import {useRootContext} from "../../../root/context/useRootContext";
+import {getRealmSetting, updateRealmSetting} from "../../../../api/external";
 
 
 const Authentication: React.FC = () => {
@@ -25,21 +27,33 @@ const Authentication: React.FC = () => {
 
     const [dataSource, setDataSource] = useState<any []>([]);
     const [noDCX509Installed, setNoDCX509Installed] = useState(false)
+    const [realmSetting, setRealmSetting] = useState<object>()
     const [configAuthData, setConfigAuthData] = useState<any>()
     const [flag, setFlag] = useState(false)
     const {setTitle} = useRootContext()
 
+    const addTwoAuthenticationData = async (data: any) => {
+        const realmSetting = await getRealmSetting('master')
+        setRealmSetting(realmSetting)
+        return [
+            ...data,
+            {
+                displayName: "two-authentication",
+                requirement: realmSetting.requiredTwoAuthenticationOTP
+            }
+        ]
+    }
 
     function getData() {
         setFlag(false)
-        getExecutionsByFlowAlias(alias).then((response) => {
+        getExecutionsByFlowAlias(alias).then(async (response) => {
             setNoDCX509Installed(false)
-            setDataSource(response?.filter((element: any) =>
+            const customData = response?.filter((element: any) =>
                 element.displayName === "X509/Validate Username Form"
                 || element.displayName === "DCX509 forms"
-            ))
+            )
+            setDataSource(await addTwoAuthenticationData(customData))
             response.forEach((element: any) => {
-
                 if (element.displayName === "X509/Validate Username Form") {
                     getConfigAuthenticationById(element.authenticationConfig).then((response) => {
                         setConfigAuthData(response)
@@ -50,17 +64,17 @@ const Authentication: React.FC = () => {
         }).catch((error) => {
             if (error?.response?.status === 404) {
                 setNoDCX509Installed(true)
-                getExecutionsByFlowAlias("browser").then((response) => {
+                getExecutionsByFlowAlias("browser").then(async (response) => {
                     const data = response?.filter((element: any) =>
                         element.displayName === "forms"
                     )
-                    setDataSource([
+                    setDataSource(await addTwoAuthenticationData([
                         ...data,
                         {
                             displayName: "X509/Validate Username Form",
                             requirement: "DISABLED"
                         }
-                    ])
+                    ]))
                     setFlag(true)
 
                 })
@@ -82,32 +96,33 @@ const Authentication: React.FC = () => {
             key: "index",
             width: "7%",
             render: (text: string, record: any, index: number) => {
-                return <Space>
-                    <Button type={"text"} icon={<UpOutlined/>}
-                            disabled={index === 0
-                                || record.requirement === 'DISABLED'
+                if (record.displayName !== 'two-authentication')
+                    return <Space>
+                        <Button type={"text"} icon={<UpOutlined/>}
+                                disabled={index === 0
+                                    || record.requirement === 'DISABLED'
 
-                            }
-                            onClick={() => {
-                                raisePriorityExecution(record?.id).then(() => {
-                                    getData()
-                                })
-                            }
-                            }
-                    />
-                    <Button type={"text"}
-                            icon={<DownOutlined/>}
-                            disabled={index === 1
-                                || record.requirement === 'DISABLED'
-                                || noDCX509Installed
-                            }
-                            onClick={() => {
-                                lowerPriorityExecution(record?.id).then(() => {
-                                    getData()
-                                })
-                            }}
-                    />
-                </Space>
+                                }
+                                onClick={() => {
+                                    raisePriorityExecution(record?.id).then(() => {
+                                        getData()
+                                    })
+                                }
+                                }
+                        />
+                        <Button type={"text"}
+                                icon={<DownOutlined/>}
+                                disabled={index === 1
+                                    || record.requirement === 'DISABLED'
+                                    || noDCX509Installed
+                                }
+                                onClick={() => {
+                                    lowerPriorityExecution(record?.id).then(() => {
+                                        getData()
+                                    })
+                                }}
+                        />
+                    </Space>
             }
         },
         {
@@ -117,7 +132,9 @@ const Authentication: React.FC = () => {
             render: (text: string, record: any) => {
                 if (text === "X509/Validate Username Form") {
                     return "Chứng chỉ số"
-
+                }
+                if (text === "two-authentication") {
+                    return "Xác thực 2 bước (FreeOTP, Google Authenticator)"
                 } else
                     return "Tài khoản, mật khẩu"
             }
@@ -133,6 +150,7 @@ const Authentication: React.FC = () => {
                     if (configAuthData?.config) {
                         defaultValue = configAuthData?.config['x509-cert-auth.mapping-source-selection'].toString()
                         onChange = (value: string) => {
+
                             updateConfigAuthentication(record?.authenticationConfig, {
                                 ...configAuthData,
                                 config: {
@@ -176,7 +194,7 @@ const Authentication: React.FC = () => {
     ]
 
 
-    const convertRequirement = (text: string, record: any) => {
+    const convertRequirement = (text: any, record: any) => {
         if (record.displayName === "X509/Validate Username Form") {
             return <Space>
                 <Checkbox
@@ -229,6 +247,30 @@ const Authentication: React.FC = () => {
                     Không hoạt động
                 </Checkbox>
             </Space>
+        }
+        if (record.displayName === 'two-authentication') {
+            return <Switch checked={text}
+                           onChange={(checked: boolean) => {
+                               updateConfigOTP({
+                                   "alias": "CONFIGURE_TOTP",
+                                   "name": "Configure OTP",
+                                   "providerId": "CONFIGURE_TOTP",
+                                   "enabled": checked,
+                                   "defaultAction": checked,
+                                   "priority": 10,
+                                   "config": {}
+                               }).then(() => {
+
+                               })
+
+                               updateRealmSetting('master', {
+                                   ...realmSetting,
+                                   "requiredTwoAuthenticationOTP": checked
+                               }).then(() => {
+                                   getData()
+                               })
+                           }}
+            />
         } else {
             return <Space>
                 <Checkbox
