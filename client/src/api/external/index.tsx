@@ -1,5 +1,5 @@
 import axios from "axios";
-import {CustomAxiosRequestConfig, DP_externalServerAxios, DP_keycloakAxios} from "../../custom/axios";
+import {CustomAxiosRequestConfig, DP_externalServerAxios} from "../../custom/axios";
 
 const baseExternalUrl = `${process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL}/external/v1`
 
@@ -32,7 +32,7 @@ export const updateClient = async (id: string | undefined, data: any) => {
 
 
 export const registration = async (data: any) => {
-    const response = await DP_keycloakAxios.post(`${baseExternalUrl}/registrations`, data)
+    const response = await DP_externalServerAxios.post(`${baseExternalUrl}/registrations`, data)
     return response?.data || []
 }
 
@@ -47,13 +47,13 @@ export const getKeycloakUrl = async () => {
 
 export const getUserClientByUserId = async (realmId: string | undefined,
                                             userId: string | undefined) => {
-    const response = await DP_keycloakAxios.get(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}`)
+    const response = await DP_externalServerAxios.get(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}`)
     return response?.data || []
 }
 
 export const getClientUsersByClientId = async (realmId: string | undefined,
                                                clientId: string | undefined) => {
-    const response = await DP_keycloakAxios.get(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`)
+    const response = await DP_externalServerAxios.get(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`)
     return response?.data || []
 }
 
@@ -76,7 +76,7 @@ export const deleteUserClients = async (
     userId: string | undefined,
     data: object
 ) => {
-    const response = await DP_keycloakAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}`, {
+    const response = await DP_externalServerAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}`, {
         data: data
     });
     return response?.data;

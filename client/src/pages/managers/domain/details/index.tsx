@@ -6,7 +6,6 @@ import {useRootContext} from "../../../root/context/useRootContext";
 import {DP_Form} from "../../../../custom/data-entry/form";
 import DP_Tabs from "../../../../custom/data-display/tabs";
 import UserSession from "./UserSession";
-import Revocation from "./Revocation";
 import {PermissionTransfer} from "./PermissionTransfer";
 import {updateClient} from "../../../../api/external";
 import TabPane = Tabs.TabPane;
@@ -127,10 +126,9 @@ const DomainDetails: React.FC<{}> = (props) => {
                     <UserSession/>
                 </TabPane>
 
-
-                <TabPane key={"revocation"} tab={"Thu hồi"}>
-                    <Revocation/>
-                </TabPane>
+                {/*<TabPane key={"revocation"} tab={"Thu hồi"}>*/}
+                {/*    <Revocation/>*/}
+                {/*</TabPane>*/}
 
 
             </DP_Tabs>
