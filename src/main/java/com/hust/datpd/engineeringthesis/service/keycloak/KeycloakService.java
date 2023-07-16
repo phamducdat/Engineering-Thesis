@@ -38,7 +38,8 @@ public class KeycloakService {
     public AccessTokenResponse getAdminKeycloakAccessToken(@NotNull String externalServerURL) {
         Keycloak keycloak = keycloakInstanceFactory.getKeycloakInstance();
         AccessTokenResponse to = keycloak.tokenManager().getAccessToken();
-        addWebOriginToAdminCli(keycloakRealm, externalServerURL);
+        if (to != null)
+            addWebOriginToAdminCli(keycloakRealm, externalServerURL);
         return to;
 
     }
