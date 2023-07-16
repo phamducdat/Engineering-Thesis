@@ -11,7 +11,6 @@ const Settings: React.FC = () => {
     return (
         <div>
             <DP_Tabs>
-
                 <TabPane tab={"Xác thực"} key={"authentication"}>
                     <Authentication/>
                 </TabPane>

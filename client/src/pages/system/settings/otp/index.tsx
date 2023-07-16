@@ -1,19 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {useParams} from "react-router-dom";
-import {Button, Form, InputNumber, Select} from "antd";
+import {Button, Form, InputNumber, Modal, Select} from "antd";
 import {useRootContext} from "../../../root/context/useRootContext";
 import {DP_Form} from "../../../../custom/data-entry/form";
+import {getRealmSetting, resetOTPConfigs} from "../../../../api/external";
 
-
+const {confirm} = Modal;
 const OTPPolicy: React.FC = () => {
     const {realmId} = useParams()
-    const {setTitle} = useRootContext()
+    const {setTitle, setSpinning} = useRootContext()
     const [form] = Form.useForm()
     const [fieldsChange, setFieldsChange] = useState(false)
     const [realmData, setRealmData] = useState<object>()
+    const [requiredTwoAuthenticationOTP, setRequiredTwoAuthenticationOTP] = useState(false)
+    const [resetOTP, setResetOTP] = useState(false)
 
     function getData() {
+        setResetOTP(false)
+        getRealmSetting('master').then((response) => {
+            setRequiredTwoAuthenticationOTP(response.requiredTwoAuthenticationOTP)
+        })
         getRealmInfoByRealmId(realmId).then((response) => {
             setRealmData(response)
             form.setFieldsValue(response)
@@ -31,6 +38,14 @@ const OTPPolicy: React.FC = () => {
             ...realmData,
             ...value
         }).then((response) => {
+            if (resetOTP) {
+                {
+                    setSpinning(true)
+                    resetOTPConfigs(realmId).then(() => {
+                        setSpinning(false)
+                    })
+                }
+            }
             getData()
         })
     }
@@ -69,10 +84,6 @@ const OTPPolicy: React.FC = () => {
                         {
                             value: 'totp',
                             label: 'Thời gian'
-                        },
-                        {
-                            value: 'hotp',
-                            label: 'Bộ đếm'
                         }
 
                     ]}/>
@@ -151,7 +162,27 @@ const OTPPolicy: React.FC = () => {
                 <Form.Item wrapperCol={{span: 4}}>
                     <Button
                         disabled={!fieldsChange}
-                        type="primary" htmlType="submit">
+                        type="primary"
+                        onClick={() => {
+                            if (requiredTwoAuthenticationOTP) {
+                                confirm({
+                                        title: 'Cài đặt lại OTP toàn bộ tài khoản',
+                                        content: 'Hệ thống đang yêu cầu xác thực 2 bước.Cấu hình này sẽ được áp dụng cho các tài khoản được tạo sau thời điểm này, bạn có muốn yêu toàn bộ tài khoản cài đặt lại theo cấu hình này?',
+                                        onOk: () => {
+                                            setResetOTP(true)
+                                            form.submit()
+                                        },
+                                        onCancel: () => {
+                                            setResetOTP(false)
+                                            form.submit()
+                                        }
+                                    }
+                                )
+                            } else
+                                form.submit()
+                        }
+                        }
+                    >
                         Đồng ý
                     </Button>
                 </Form.Item>

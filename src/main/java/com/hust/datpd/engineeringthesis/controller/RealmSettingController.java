@@ -47,4 +47,18 @@ public class RealmSettingController {
         return ResponseEntity.ok(service.updateRealmSetting(from));
 
     }
+
+    @PostMapping("/reset-otp-configs")
+    public ResponseEntity<?> resetOTPConfigs(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+
+    ) {
+        if (!validatorUtil.validAdminToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
+        service.resetOTPConfigs();
+        return ResponseEntity.ok("");
+
+    }
 }

@@ -61,4 +61,9 @@ public class RealmSettingService {
 
         return mapper.mapFromRealmSettingEntity(entity);
     }
+
+    public void resetOTPConfigs() {
+        twoAuthenticatorOTPKeycloakService.disableTwoAuthenticatorOTP();
+        twoAuthenticatorOTPKeycloakService.requiredTwoAuthenticatorOTP();
+    }
 }

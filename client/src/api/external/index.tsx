@@ -41,6 +41,14 @@ export const updateRealmSetting = async (id: string | undefined, data: any) => {
     return response?.data || []
 }
 
+export const resetOTPConfigs = async (id: string | undefined) => {
+    const config: CustomAxiosRequestConfig = {
+        disableMessage: true
+    }
+    const response = await DP_externalServerAxios.post(`${baseExternalUrl}/admin/realms/${id}/settings/reset-otp-configs`, null, config)
+    return response?.data || []
+}
+
 export const getKeycloakUrl = async () => {
     const response = await axios.get(`${baseExternalUrl}/admin/keycloak/info`)
     if (response) {
