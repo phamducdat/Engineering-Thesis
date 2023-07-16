@@ -138,10 +138,10 @@ export const User: React.FC = () => {
                 </Button>}
             >
                 <TabPane key={"user"} tab={"Tất cả"}>
-                    <DP_Table
+                    {dataSource && <DP_Table
                         columns={columns}
                         dataSource={dataSource}
-                    />
+                    />}
                 </TabPane>
             </DP_Tabs>
 

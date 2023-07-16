@@ -1,4 +1,4 @@
-import {Button, Col, Form, Input, message, ModalProps, Row} from "antd";
+import {Button, Col, Form, Input, ModalProps, Row} from "antd";
 import React, {useEffect, useState} from "react";
 import {DP_Form} from "../../../custom/data-entry/form";
 import {useNavigate, useParams} from "react-router-dom";
@@ -28,6 +28,8 @@ export const CreateClient: React.FC<ModalProps> = props => {
             "id": id,
         }).then((response) => {
             navigate(`/realm/${realmId}/managers/domain/${id}?tab-key=details`)
+        }).finally(() => {
+            setLoading(false)
         })
     }
 

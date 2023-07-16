@@ -11,13 +11,12 @@ const Settings: React.FC = () => {
     return (
         <div>
             <DP_Tabs>
-
                 <TabPane tab={"Xác thực"} key={"authentication"}>
                     <Authentication/>
                 </TabPane>
-                {/*<TabPane tab={"OTP"} key={"otp"}>*/}
-                {/*    <OTPPolicy/>*/}
-                {/*</TabPane>*/}
+                <TabPane tab={"OTP"} key={"otp"}>
+                    <OTPPolicy/>
+                </TabPane>
                 <TabPane tab={"Khác"} key={"other"}>
                     <Other/>
                 </TabPane>

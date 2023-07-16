@@ -5,6 +5,7 @@ import {TransferDirection} from "antd/es/transfer";
 import {Transfer} from "antd";
 import {getUsers} from "../../../../api/user";
 import {getMe} from "../../../../api/admin";
+import {useRootContext} from "../../../root/context/useRootContext";
 
 interface RecordType {
     key: string;
@@ -19,18 +20,20 @@ export const PermissionTransfer: React.FC<{}> = props => {
     const [dataSource, setDataSource] = useState<RecordType[]>()
     const [flag, setFlag] = useState(false)
     const {realmId, domainId} = useParams()
+    const {setSpinning} = useRootContext()
 
 
-    useEffect(() => {
-
+    async function getData() {
         setFlag(false)
-        getClientUsersByClientId(realmId, domainId).then((res) => {
+        setSpinning(true)
+
+        await getClientUsersByClientId(realmId, domainId).then((res) => {
             setTargetKeys(res.userIds)
         }).finally(() => {
             setFlag(true)
         })
 
-        getUsers(realmId).then((response) => {
+        await getUsers(realmId).then((response) => {
             const convertData = response
                 .filter((data: any) => data.id !== getMe().sub)
                 .map((item: any) => {
@@ -41,6 +44,11 @@ export const PermissionTransfer: React.FC<{}> = props => {
                 })
             setDataSource(convertData)
         })
+        setSpinning(false)
+    }
+
+    useEffect(() => {
+        getData();
     }, [])
 
 
@@ -51,16 +59,18 @@ export const PermissionTransfer: React.FC<{}> = props => {
                 userIds: moveKeys
             }
             createClientUsers(realmId, domainId, data).then(r => {
+                getData()
             })
         } else if (direction === 'left') {
             const data = {
                 userIds: moveKeys
             }
             deleteClientUsers(realmId, domainId, data).then(r => {
+                getData()
             })
         }
 
-        setTargetKeys(nextTargetKeys);
+        // setTargetKeys(nextTargetKeys);
     };
 
     const onSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {

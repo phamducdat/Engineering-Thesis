@@ -3,19 +3,23 @@ version: '3'
 
 services:
   server:
-    image: datpd2402/external-server:2.0.7
+    image: external-server:latest
     container_name: external-server
     environment:
       SPRING_PROFILES_ACTIVE: postgres,docker
       KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL}
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      SSL_KEY_STORE_PASSWORD: ${SSL_KEY_STORE_PASSWORD}
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/keycloak
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./localhost.p12:/etc/ssl/certs/ssl.p12
     ports:
-      - "8000:8000"
+      - "8000:8080"
+      - "8444:8443"
     depends_on:
       - postgres
     networks:

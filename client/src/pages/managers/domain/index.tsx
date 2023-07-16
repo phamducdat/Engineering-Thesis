@@ -13,19 +13,20 @@ export const Domain: React.FC = () => {
 
     const {realmId} = useParams()
     const [dataSource, setDataSource] = useState<any[]>()
-    const [openCreateModal, setOpenCreateModal] = useState(false)
-    const {setTitle, reloadData, setReloadData} = useRootContext()
+    const {setTitle, reloadData, setReloadData, setSpinning} = useRootContext()
     const [searchParams] = useSearchParams()
     let navigate = useNavigate()
 
 
     function initData() {
         const search = searchParams.get('search')
+        setSpinning(true)
         getAllClients(realmId, {
             clientId: search,
             search: true,
         }).then((response) => {
             setDataSource(filterClient(response))
+            setSpinning(false)
         })
     }
 
@@ -35,7 +36,6 @@ export const Domain: React.FC = () => {
 
     useEffect(() => {
         setReloadData(null)
-        setOpenCreateModal(false)
         initData();
         setTitle("Domain")
     }, [])
