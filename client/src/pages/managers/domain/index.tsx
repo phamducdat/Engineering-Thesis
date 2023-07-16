@@ -13,7 +13,6 @@ export const Domain: React.FC = () => {
 
     const {realmId} = useParams()
     const [dataSource, setDataSource] = useState<any[]>()
-    const [openCreateModal, setOpenCreateModal] = useState(false)
     const {setTitle, reloadData, setReloadData} = useRootContext()
     const [searchParams] = useSearchParams()
     let navigate = useNavigate()
@@ -35,7 +34,6 @@ export const Domain: React.FC = () => {
 
     useEffect(() => {
         setReloadData(null)
-        setOpenCreateModal(false)
         initData();
         setTitle("Domain")
     }, [])

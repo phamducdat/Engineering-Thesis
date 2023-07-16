@@ -1,9 +1,11 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Layout, Spin} from 'antd';
 import DP_Sider from "./sider";
 import DP_Header from "./header";
-import {Outlet, useLocation, useNavigate, useSearchParams} from "react-router-dom";
+import {Outlet} from "react-router-dom";
 import {RootContext} from "./context/root-context";
+import {getKeycloakUrl} from "../../api/external";
+import {refreshAccessToken} from "../../custom/axios";
 
 const {Header, Content, Footer} = Layout;
 
@@ -12,8 +14,21 @@ const RootPage: React.FC = () => {
     const [title, setTitle] = useState("Title");
     const [reloadData, setReloadData] = useState(null)
     const [spinning, setSpinning] = useState(false)
+    const [flag, setFlag] = useState(false)
 
-
+    useEffect(() => {
+        setFlag(false)
+        if (localStorage.getItem("keycloakUrl") === null ||
+            localStorage.getItem("keycloakUrl") === "undefined")
+            getKeycloakUrl().then(() => {
+                refreshAccessToken().then(() => {
+                    setFlag(true)
+                })
+            })
+        else {
+            setFlag(true)
+        }
+    }, [])
 
     return (
         <RootContext.Provider value={{
@@ -40,7 +55,7 @@ const RootPage: React.FC = () => {
                                 height: "85vh"
                             }}
                         >
-                            <Outlet/>
+                            {flag && <Outlet/>}
                         </Content>
                     </Spin>
                 </Layout>

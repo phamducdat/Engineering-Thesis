@@ -14,10 +14,13 @@ export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
     }
 }
 
+const getKeycloakURL = () => localStorage.getItem('keycloakUrl') || undefined;
+const getExternalServerURL = () => process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL;
 
-const createCustomAxios = (baseURL: any) => {
+
+const createCustomAxios = (getBaseURL: () => string | undefined) => {
     const instance = axios.create({
-        baseURL: baseURL || undefined,
+        baseURL: getBaseURL() || undefined,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem("access_token")}`
@@ -27,7 +30,7 @@ const createCustomAxios = (baseURL: any) => {
     instance.interceptors.request.use(
         async (config) => {
             const token = await refreshAccessToken();
-            config.baseURL = baseURL || undefined;
+            config.baseURL = getBaseURL() || undefined;
             config.headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -131,6 +134,6 @@ export const refreshAccessToken = async () => {
     }
 }
 
-export const DP_keycloakAxios = createCustomAxios(localStorage.getItem("keycloakUrl"));
+export const DP_keycloakAxios = createCustomAxios(getKeycloakURL);
+export const DP_externalServerAxios = createCustomAxios(getExternalServerURL);
 
-export const DP_externalServerAxios = createCustomAxios(process.env.REACT_APP_KEYCLOAK_EXTERNAL_URL);

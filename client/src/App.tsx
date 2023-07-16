@@ -17,14 +17,7 @@ import {getKeycloakUrl} from "./api/external";
 function App() {
 
 
-    useEffect(() => {
-        if (localStorage.getItem("keycloakUrl") === null ||
-            localStorage.getItem("keycloakUrl") === "undefined")
-            getKeycloakUrl().then(() => {
-                refreshAccessToken().then(() => {
-                })
-            })
-    }, [])
+
 
     return (
         <>
