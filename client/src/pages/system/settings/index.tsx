@@ -15,9 +15,9 @@ const Settings: React.FC = () => {
                 <TabPane tab={"Xác thực"} key={"authentication"}>
                     <Authentication/>
                 </TabPane>
-                {/*<TabPane tab={"OTP"} key={"otp"}>*/}
-                {/*    <OTPPolicy/>*/}
-                {/*</TabPane>*/}
+                <TabPane tab={"OTP"} key={"otp"}>
+                    <OTPPolicy/>
+                </TabPane>
                 <TabPane tab={"Khác"} key={"other"}>
                     <Other/>
                 </TabPane>
