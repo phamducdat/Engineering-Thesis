@@ -46,7 +46,7 @@
   "maxDeltaTimeSeconds": 43200,
   "failureFactor": 30,
   "defaultRole": {
-    "id": "1517b641-0386-4760-90c6-91a03a10e54c",
+    "id": "d3ed1d28-a9e7-4148-80e7-6eca0ccf1585",
     "name": "default-roles-master",
     "description": "${role_default-roles}",
     "composite": true,
@@ -56,15 +56,14 @@
   "requiredCredentials": [
     "password"
   ],
-  "otpPolicyType": "totp",
+  "otpPolicyType": "hotp",
   "otpPolicyAlgorithm": "HmacSHA1",
-  "otpPolicyInitialCounter": 0,
-  "otpPolicyDigits": 6,
+  "otpPolicyInitialCounter": 1,
+  "otpPolicyDigits": 8,
   "otpPolicyLookAheadWindow": 1,
   "otpPolicyPeriod": 30,
   "otpSupportedApplications": [
-    "FreeOTP",
-    "Google Authenticator"
+    "FreeOTP"
   ],
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicySignatureAlgorithms": [

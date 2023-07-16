@@ -5,6 +5,7 @@ import {getAllClients} from "../../../../api/clients";
 import {useParams} from "react-router-dom";
 import {createUserClients, deleteUserClients, getUserClientByUserId} from "../../../../api/external";
 import {filterClient} from "../../../../custom/filter-client";
+import {useRootContext} from "../../../root/context/useRootContext";
 
 interface RecordType {
     key: string;
@@ -19,18 +20,19 @@ export const PermissionTransfer: React.FC<{}> = props => {
     const [dataSource, setDataSource] = useState<RecordType[]>()
     const [flag, setFlag] = useState(false)
     const {realmId, userId} = useParams()
+    const {setSpinning} = useRootContext()
 
 
-    useEffect(() => {
-
+    async function getData() {
         setFlag(false)
-        getUserClientByUserId(realmId, userId).then((res) => {
+        setSpinning(true)
+        await getUserClientByUserId(realmId, userId).then((res) => {
             setTargetKeys(res.clientIds)
         }).finally(() => {
             setFlag(true)
         })
 
-        getAllClients(realmId).then((response) => {
+        await getAllClients(realmId).then((response) => {
             const baseData = filterClient(response)?.map((item: any) => {
                 return {
                     key: item.id,
@@ -42,6 +44,11 @@ export const PermissionTransfer: React.FC<{}> = props => {
 
 
         })
+        setSpinning(false)
+    }
+
+    useEffect(() => {
+        getData();
     }, [])
 
 
@@ -52,16 +59,18 @@ export const PermissionTransfer: React.FC<{}> = props => {
                 clientIds: moveKeys
             }
             createUserClients(realmId, userId, data).then(r => {
+                getData()
             })
         } else if (direction === 'left') {
             const data = {
                 clientIds: moveKeys
             }
             deleteUserClients(realmId, userId, data).then(r => {
+                getData()
             })
         }
 
-        setTargetKeys(nextTargetKeys);
+        // setTargetKeys(nextTargetKeys);
     };
 
     const onSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
