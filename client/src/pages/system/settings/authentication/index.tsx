@@ -30,7 +30,7 @@ const Authentication: React.FC = () => {
     const [realmSetting, setRealmSetting] = useState<object>()
     const [configAuthData, setConfigAuthData] = useState<any>()
     const [flag, setFlag] = useState(false)
-    const {setTitle} = useRootContext()
+    const {setTitle, setSpinning} = useRootContext()
 
     const addTwoAuthenticationData = async (data: any) => {
         const realmSetting = await getRealmSetting('master')
@@ -46,6 +46,7 @@ const Authentication: React.FC = () => {
 
     function getData() {
         setFlag(false)
+        setSpinning(true)
         getExecutionsByFlowAlias(alias).then(async (response) => {
             setNoDCX509Installed(false)
             const customData = response?.filter((element: any) =>
@@ -58,6 +59,7 @@ const Authentication: React.FC = () => {
                     getConfigAuthenticationById(element.authenticationConfig).then((response) => {
                         setConfigAuthData(response)
                         setFlag(true)
+                        setSpinning(false)
                     })
                 }
             })
@@ -76,6 +78,7 @@ const Authentication: React.FC = () => {
                         }
                     ]))
                     setFlag(true)
+                    setSpinning(false)
 
                 })
             }
@@ -251,6 +254,8 @@ const Authentication: React.FC = () => {
         if (record.displayName === 'two-authentication') {
             return <Switch checked={text}
                            onChange={(checked: boolean) => {
+
+                               setSpinning(true)
                                updateConfigOTP({
                                    "alias": "CONFIGURE_TOTP",
                                    "name": "Configure OTP",
@@ -260,15 +265,18 @@ const Authentication: React.FC = () => {
                                    "priority": 10,
                                    "config": {}
                                }).then(() => {
-
+                                   updateRealmSetting('master', {
+                                       ...realmSetting,
+                                       "requiredTwoAuthenticationOTP": checked
+                                   }).then(() => {
+                                       getData()
+                                       setSpinning(false)
+                                   })
+                               }).catch((error) => {
+                                   setSpinning(false)
                                })
 
-                               updateRealmSetting('master', {
-                                   ...realmSetting,
-                                   "requiredTwoAuthenticationOTP": checked
-                               }).then(() => {
-                                   getData()
-                               })
+
                            }}
             />
         } else {
@@ -317,6 +325,7 @@ const Authentication: React.FC = () => {
 
 
     const createDigitalCertificate = async (requirement: string) => {
+        setSpinning(true)
         try {
             await copyBrowserAuthentication(alias);
             const addExecutionResponse = await addExecution(alias);
@@ -338,8 +347,10 @@ const Authentication: React.FC = () => {
                 }, true)
             ]);
             message.success("Cập nhật thành công")
+            setSpinning(false)
         } catch (error) {
             console.error(error);
+            setSpinning(false)
         }
     }
 
