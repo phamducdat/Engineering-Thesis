@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {DP_Form} from "../../../../custom/data-entry/form";
-import {Button, Col, Form, InputNumber, Row, Select} from "antd";
+import {Button, Form, InputNumber, Switch} from "antd";
 import {getRealmInfoByRealmId, updateRealmByRealmId} from "../../../../api/realms";
 import {useParams} from "react-router-dom";
 import {useRootContext} from "../../../root/context/useRootContext";
@@ -15,7 +15,6 @@ const Other: React.FC = () => {
     const [options, setOptions] = useState({
         accessTokenLifespanStyle: 'minutes',
     })
-
 
 
     function getData() {
@@ -59,45 +58,62 @@ const Other: React.FC = () => {
                 onFieldsChange={() => {
                     setFieldsChange(true)
                 }}
+                labelCol={{span: 7}}
+                labelAlign={"left"}
+                style={{maxWidth: 600}}
+                wrapperCol={{span: 10}}
+
                 onFinish={onFinish}
             >
-                <Row gutter={12}>
-                    <Col span={5}>
-                        <Form.Item
-                            label={"Thời gian hiệu lực other"}
-                            name={"accessTokenLifespan"}
-                        >
-                            <InputNumber
-                                style={{width: '100%'}}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={2}>
+                <Form.Item
+                    label={"Ghi nhớ đăng nhập"}
+                    name="rememberMe"
+                    valuePropName={"checked"}
+                >
+                    <Switch/>
+                </Form.Item>
 
-                        <Select
-                            style={{width: '100%'}}
-                            value={options.accessTokenLifespanStyle}
-                            onChange={(value) => setOptions({
-                                ...options,
-                                accessTokenLifespanStyle: value
-                            })}
-                            options={[
-                                {
-                                    value: 'minutes',
-                                    label: 'Phút',
-                                },
-                                // {
-                                //     value: 'hours',
-                                //     label: 'Hours',
-                                // },
-                                // {
-                                //     value: 'days',
-                                //     label: 'Days'
-                                // }
-                            ]}
-                        />
-                    </Col>
-                </Row>
+                <Form.Item
+                    label={"Đăng nhập bằng email"}
+                    name="loginWithEmailAllowed"
+                    valuePropName={"checked"}
+                >
+                    <Switch/>
+                </Form.Item>
+
+                <Form.Item
+                    label={"Thời gian hiệu lực (phút)"}
+                    name={"accessTokenLifespan"}
+                    rules={[
+                        () => ({
+                            validator(_, value) {
+                                if (value < 30) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error('Thời gian hiệu lực không được vượt quá 30'));
+                            },
+                        }),
+                    ]}
+                >
+                    <InputNumber
+                        style={{width: '100%'}}
+                    />
+                </Form.Item>
+
+                {/*<Select*/}
+                {/*    style={{width: '100%'}}*/}
+                {/*    value={options.accessTokenLifespanStyle}*/}
+                {/*    onChange={(value) => setOptions({*/}
+                {/*        ...options,*/}
+                {/*        accessTokenLifespanStyle: value*/}
+                {/*    })}*/}
+                {/*    options={[*/}
+                {/*        {*/}
+                {/*            value: 'minutes',*/}
+                {/*            label: 'Phút',*/}
+                {/*        },*/}
+                {/*    ]}*/}
+                {/*/>*/}
 
                 <Form.Item wrapperCol={{span: 4}}>
                     <Button
