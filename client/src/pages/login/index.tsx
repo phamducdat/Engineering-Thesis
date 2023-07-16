@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Form, Input, Row} from "antd";
+import {Button, Card, Form, Input, message, Row} from "antd";
 import {useNavigate} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import {loginAdminAccount} from "../../api/external";
+import {convertWarningMessage} from "../../custom/axios/util";
 
 
 export const Login: React.FC = () => {
@@ -25,6 +26,9 @@ export const Login: React.FC = () => {
                 localStorage.setItem("token_type", response?.token_type)
                 navigate(`/realm/master/managers/domain`)
             }
+        }).catch(error => {
+            if (error.response.status !== 500)
+                message.warning(convertWarningMessage(error.response?.data.errorMessage))
         }).finally(() => {
             setLoading(false)
         })
@@ -96,9 +100,6 @@ export const Login: React.FC = () => {
                     <Row justify={"space-between"}>
                         <Button type="primary"
                                 htmlType="submit"
-                                onClick={() => {
-                                    form.submit()
-                                }}
                                 loading={loading}
                         >
                             Đăng nhập
