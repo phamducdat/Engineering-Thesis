@@ -82,7 +82,7 @@ const Other: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label={"Thời gian hiệu lực (phút)"}
+                    label={"Thời gian hiệu lực token (phút)"}
                     name={"accessTokenLifespan"}
                     rules={[
                         () => ({
@@ -90,7 +90,7 @@ const Other: React.FC = () => {
                                 if (value < 30) {
                                     return Promise.resolve();
                                 }
-                                return Promise.reject(new Error('Thời gian hiệu lực không được vượt quá 30'));
+                                return Promise.reject(new Error('Thời gian hiệu lực token không được vượt quá 30'));
                             },
                         }),
                     ]}

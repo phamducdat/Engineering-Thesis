@@ -50,7 +50,7 @@ export const UserContent: React.FC<UserContentProps> = props => {
                         <Form.Item
                             label="Tên tài khoản"
                             name="username"
-                            rules={[{required: true, message: 'Please input your username!'}]}
+                            rules={[{required: true, message: 'Vui lòng nhập tên tài khoản!'}]}
                         >
                             <Input disabled={props.mode === mode.Update}/>
                         </Form.Item>
