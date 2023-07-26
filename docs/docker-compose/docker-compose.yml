@@ -2,12 +2,12 @@ version: '3'
 
 services:
   server:
-    image: datpd2402/external-server:2.0.9
+    image: external-server:latest
     container_name: external-server
     restart: unless-stopped   # Restart policy for the server service
     environment:
       SPRING_PROFILES_ACTIVE: postgres,docker
-      KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL}
+      KEYCLOAK_SERVER_URL: http://127.0.0.1:8080/auth
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       SSL_KEY_STORE_PASSWORD: ${SSL_KEY_STORE_PASSWORD}
