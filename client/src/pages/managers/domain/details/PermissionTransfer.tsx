@@ -111,7 +111,7 @@ export const PermissionTransfer: React.FC<{}> = props => {
                     <Row>
                         <Col span={5}>
                             <Form.Item
-                                label={"Trạng thái nhân sự"}
+                                label={"Trạng thái tài khoản"}
                             >
                                 <Select
                                     style={{width: "100%"}}
