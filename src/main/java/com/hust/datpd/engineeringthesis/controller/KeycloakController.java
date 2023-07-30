@@ -81,6 +81,11 @@ public class KeycloakController {
                     new ErrorResponse("Đã tồn tại Đường dẫn")
             );
         }
+        if (!validatorUtil.isValidURL(from.getUrl())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ErrorResponse("Đường dẫn không hợp ")
+            );
+        }
 
         keycloakService.createClient(realm, from.getId(),
                 from.getClientId(), from.getUrl());
