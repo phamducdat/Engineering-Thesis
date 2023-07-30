@@ -20,6 +20,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.ws.rs.NotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
@@ -131,7 +133,24 @@ public class ValidatorUtil {
         });
     }
 
+    public boolean isValidURL(String inputURL) {
+        if (inputURL != null && !inputURL.isEmpty()) {
+            try {
+                URL url = new URL(inputURL);
 
+                boolean pathCheck = url.getPath().equals("/") || url.getPath().isEmpty();
+                boolean queryCheck = url.getQuery() == null;
+                boolean hashCheck = url.getRef() == null;
+                boolean endSlashCheck = !inputURL.endsWith("/");
+
+                return pathCheck && queryCheck && hashCheck && endSlashCheck;
+            } catch (MalformedURLException e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     public boolean userExists(String realmName, String userId) {
 
         Keycloak keycloak =
