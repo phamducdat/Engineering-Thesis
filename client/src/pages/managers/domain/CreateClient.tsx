@@ -34,13 +34,16 @@ export const CreateClient: React.FC<ModalProps> = props => {
     }
 
     const isValidURL = (inputURL: any) => {
-        try {
-            let url = new URL(inputURL);
-            return !(url.pathname !== '/' || url.search !== '' || url.hash !== '' || inputURL.endsWith('/'));
+        if (inputURL !== undefined && inputURL !== "")
+            try {
+                let url = new URL(inputURL);
+                return !(url.pathname !== '/' || url.search !== '' || url.hash !== '' || inputURL.endsWith('/'));
 
-        } catch (error) {
-            return false;
-        }
+            } catch (error) {
+                return false;
+            }
+        else
+            return true
     }
 
 

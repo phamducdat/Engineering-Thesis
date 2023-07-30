@@ -73,12 +73,17 @@ public class KeycloakController {
             );
         if (validatorUtil.clientExistsByClientId(realm, from.getClientId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ErrorResponse("Đã tồn tại domainId")
+                    new ErrorResponse("Đã tồn tại Domain Id")
             );
         }
         if (validatorUtil.clientExistsByURL(realm, from.getUrl())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ErrorResponse("Đã tồn tại url")
+                    new ErrorResponse("Đã tồn tại Đường dẫn")
+            );
+        }
+        if (!validatorUtil.isValidURL(from.getUrl())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ErrorResponse("Đường dẫn không hợp ")
             );
         }
 
