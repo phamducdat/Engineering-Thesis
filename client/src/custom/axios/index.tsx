@@ -128,6 +128,7 @@ export const refreshAccessToken = async () => {
 
         return response.data?.access_token;
     } catch (error) {
+        localStorage.clear()
         if (window.location.pathname != "/login" && window.location.pathname != "/registration") {
             window.location.href = '/login';
         }
