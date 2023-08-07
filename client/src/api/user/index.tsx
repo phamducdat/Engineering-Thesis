@@ -82,7 +82,11 @@ export const logoutUserSessionSessionId = async (realm: string | undefined,
 }
 
 export const logoutUserByUserId = async (realmId: string | undefined,
-                                         userId: string | undefined) => {
-    const response = await DP_keycloakAxios.post(`/admin/realms/${realmId}/users/${userId}/logout`)
+                                         userId: string | undefined,
+                                         disableMessage: boolean = false
+) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: disableMessage}
+
+    const response = await DP_keycloakAxios.post(`/admin/realms/${realmId}/users/${userId}/logout`, null, config)
     return response?.data
 }
