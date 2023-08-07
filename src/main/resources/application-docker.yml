@@ -45,7 +45,7 @@ spring:
 
 ---
 spring:
-  profiles: default
+  profiles: h2
   datasource:
     driver-class-name: org.h2.Driver
   jpa:
