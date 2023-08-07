@@ -2,12 +2,15 @@ version: '3'
 
 services:
   server:
-    image: external-server:latest
+    image: datpd2402/external-server:2.0.12
     container_name: external-server
+    command: /app/start-app.sh
+    extra_hosts:
+      - "keycloak-utm.com:192.168.48.7"
     restart: unless-stopped   # Restart policy for the server service
     environment:
       SPRING_PROFILES_ACTIVE: postgres,docker
-      KEYCLOAK_SERVER_URL: http://127.0.0.1:8080/auth
+      KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL}
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       SSL_KEY_STORE_PASSWORD: ${SSL_KEY_STORE_PASSWORD}
@@ -15,14 +18,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./localhost.p12:/etc/ssl/certs/ssl.p12
+      - ../x509/manage.com.p12:/etc/ssl/certs/ssl.p12
+      - ../x509/rootCA.crt:/var/ssl/rootCA.crt
     ports:
-      - "8000:8080"
-      - "8444:8443"
+      - "8080"
+      - "8443"
     depends_on:
       - postgres
     networks:
       - app-network
+      - my-network  # Add this line
 
   postgres:
     image: postgres:13.2
@@ -36,6 +41,9 @@ services:
       - "5432:5432"
     networks:
       - app-network
+      - my-network  # Add this line
 
 networks:
   app-network:
+  my-network: # And add these two lines
+    external: true
