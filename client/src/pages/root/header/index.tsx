@@ -14,7 +14,7 @@ const DP_Header: React.FC<{}> = (props) => {
     const {realmId} = useParams()
 
     useEffect(() => {
-        document.title = title + " - DP"
+        document.title = title + " - Trung tâm An toàn thông tin Bách Khoa"
     }, [title])
 
 
