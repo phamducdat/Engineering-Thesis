@@ -67,6 +67,7 @@ const Other: React.FC = () => {
             >
                 <Form.Item
                     label={"Ghi nhớ đăng nhập"}
+                    labelCol={{span:10}}
                     name="rememberMe"
                     valuePropName={"checked"}
                 >
@@ -75,6 +76,7 @@ const Other: React.FC = () => {
 
                 <Form.Item
                     label={"Đăng nhập bằng email"}
+                    labelCol={{span:10}}
                     name="loginWithEmailAllowed"
                     valuePropName={"checked"}
                 >
@@ -84,6 +86,7 @@ const Other: React.FC = () => {
                 <Form.Item
                     label={"Thời gian hiệu lực token (phút)"}
                     name={"accessTokenLifespan"}
+                    labelCol={{span:10}}
                     rules={[
                         () => ({
                             validator(_, value) {
@@ -96,7 +99,7 @@ const Other: React.FC = () => {
                     ]}
                 >
                     <InputNumber
-                        style={{width: '100%'}}
+
                     />
                 </Form.Item>
 

@@ -12,7 +12,7 @@ export const Login: React.FC = () => {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        document.title = "Đăng nhập - DP"
+        document.title = "Đăng nhập - Trung tâm An toàn thông tin Bách Khoa"
     }, [])
 
     const onFinish = (values: any) => {
