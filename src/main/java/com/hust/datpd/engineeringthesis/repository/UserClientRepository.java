@@ -17,6 +17,10 @@ public interface UserClientRepository extends JpaRepository<UserClientEntity, Us
 
     void deleteByIdRealmId(String realmId);
 
+    void deleteById_UserId(String userId);
+
+    void deleteById_ClientId(String clientId);
+
     Optional<UserClientEntity> findById(UserClientId id);
 
 }

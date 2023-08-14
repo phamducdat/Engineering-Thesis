@@ -153,6 +153,20 @@ public class UserClientController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/users/{userId}/all")
+    public ResponseEntity<?> deleteUserClientsByUserId(
+            @PathVariable String realmId,
+            @PathVariable String userId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+    ) {
+        if (!validatorUtil.validAdminToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
+        service.deleteUserClientsByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @PostMapping("/clients/{clientId}")
     public ResponseEntity<?> createClientUsers(@PathVariable String clientId,
                                                @PathVariable String realmId,
@@ -172,6 +186,20 @@ public class UserClientController {
         );
         return ResponseEntity.status(HttpStatus.OK).build();
 
+    }
+
+    @DeleteMapping("/clients/{clientId}/all")
+    public ResponseEntity<?> deleteUserClientsByClientId(
+            @PathVariable String realmId,
+            @PathVariable String clientId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
+    ) {
+        if (!validatorUtil.validAdminToken(authHeader))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ErrorResponse("Tài khoản không hợp lệ")
+            );
+        service.deleteClientUsersByClientId(clientId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

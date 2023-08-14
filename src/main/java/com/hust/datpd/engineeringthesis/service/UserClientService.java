@@ -82,6 +82,12 @@ public class UserClientService {
                 from);
         repository.saveAll(to);
     }
+    @Transactional
+    public void deleteUserClientsByUserId(
+            String userId
+    ) {
+        repository.deleteById_UserId(userId);
+    }
 
     public void createClientUsers(
             String realmId,
@@ -103,11 +109,18 @@ public class UserClientService {
         repository.deleteAll(to);
     }
 
+
     public void deleteClientUsers(String realmId,
                                   String clientId,
                                   ClientUserDto dto) {
         List<UserClientEntity> to = mapper.mapFromClientUserDTO(realmId, clientId, dto);
         repository.deleteAll(to);
     }
+
+    @Transactional
+    public void deleteClientUsersByClientId(String clientId) {
+        repository.deleteById_ClientId(clientId);
+    }
+
 
 }
