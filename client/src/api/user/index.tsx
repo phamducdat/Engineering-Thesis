@@ -29,8 +29,11 @@ export const getUserCredentialsById = async (realm: string | undefined,
 export const deleteUserCredentialById = async (
     realm: string | undefined,
     userId: string | undefined,
-    credentialId: string | null) => {
-    const response = await DP_keycloakAxios.delete(`/admin/realms/${realm}/users/${userId}/credentials/${credentialId}`)
+    credentialId: string | null,
+    disableMessage: boolean = false
+    ) => {
+    const config: CustomAxiosRequestConfig = {disableMessage: disableMessage}
+    const response = await DP_keycloakAxios.delete(`/admin/realms/${realm}/users/${userId}/credentials/${credentialId}`,config)
     return response?.data
 }
 

@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import {deleteUserCredentialById, getUserCredentialsById, resetPassword} from "../../../../api/user";
+import {deleteUserCredentialById, getUserCredentialsById, resetPassword, updateUser} from "../../../../api/user";
 import {DP_Form} from "../../../../custom/data-entry/form";
 import {Button, Col, Form, Input, Modal, Row, Switch} from "antd";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {ExclamationCircleOutlined, RedoOutlined} from "@ant-design/icons";
 
 interface UserCredentialsProps {
     userData: any; // Update the type 'any' to the appropriate type for your userData
@@ -13,6 +13,7 @@ interface UserCredentialsProps {
 const UserCredentials: React.FC<UserCredentialsProps> = props => {
     const {realmId, userId} = useParams();
     const [passwordCredentialId, setPasswordCredentialId] = useState(null)
+    const [otpCredentialId, setOtpCredentialId] = useState(null)
     const [isFormChanged, setIsFormChanged] = useState(false)
     const [form] = Form.useForm()
     const userData = props.userData
@@ -21,10 +22,14 @@ const UserCredentials: React.FC<UserCredentialsProps> = props => {
         form.resetFields()
         setIsFormChanged(false)
         setPasswordCredentialId(null)
+        setOtpCredentialId(null)
         getUserCredentialsById(realmId, userId).then((response: any) => {
             if (response.length > 0) {
-                const isHasBeenSet = response.filter((element: any) => element.type === 'password')
-                setPasswordCredentialId(isHasBeenSet[0].id)
+                const isHasBeenSetPassword = response.filter((element: any) => element.type === 'password')
+                setPasswordCredentialId(isHasBeenSetPassword[0].id)
+
+                const isHasBeenSetOTP = response.filter((element: any) => element.type === 'otp')
+                setOtpCredentialId(isHasBeenSetOTP[0].id)
             }
         })
     }
@@ -41,6 +46,25 @@ const UserCredentials: React.FC<UserCredentialsProps> = props => {
             onOk: () => {
                 deleteUserCredentialById(realmId, userId, passwordCredentialId).then(() => {
                     getData()
+                })
+            }
+        })
+    }
+
+    const handleOnResetOTPConfig = () => {
+        Modal.confirm({
+            title: "Bạn có chắn chắn muốn yêu cầu thiết lập lại xác thực bằng mã OTP của tài khoản: " + userData.username,
+            icon: <ExclamationCircleOutlined/>,
+            onOk: () => {
+                deleteUserCredentialById(realmId, userId, otpCredentialId, true).then(() => {
+                    updateUser(realmId, userId, {
+                        ...userData,
+                        "requiredActions": [
+                            "CONFIGURE_TOTP"
+                        ],
+                    }).then(() => {
+                        getData()
+                    })
                 })
             }
         })
@@ -119,6 +143,14 @@ const UserCredentials: React.FC<UserCredentialsProps> = props => {
                 >
                     <Switch/>
                 </Form.Item>
+
+                <Button style={{marginBottom: "24px"}}
+                        icon={<RedoOutlined/>}
+                        onClick={handleOnResetOTPConfig}
+                        disabled={!otpCredentialId}
+                >
+                    Thiết lập lại xác thực OTP
+                </Button>
 
                 <Col span={6}>
                     <Row gutter={24} justify={"space-between"}>
