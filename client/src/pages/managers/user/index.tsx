@@ -7,6 +7,7 @@ import DP_Tabs from "../../../custom/data-display/tabs";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
 import {DP_Table} from "../../../custom/data-display/table";
 import {getMe} from "../../../api/admin";
+import {deleteUserClientsByUserId} from "../../../api/external";
 import TabPane = Tabs.TabPane;
 
 export const User: React.FC = () => {
@@ -110,8 +111,10 @@ export const User: React.FC = () => {
                             () => {
                                 setSpinning(true)
                                 deleteUser(realmId, userId).then(() => {
-                                    setSpinning(false)
-                                    setReloadData("user")
+                                    deleteUserClientsByUserId(realmId, userId).then(() => {
+                                        setSpinning(false)
+                                        setReloadData("user")
+                                    })
                                 })
                             }
 

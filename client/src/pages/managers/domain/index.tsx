@@ -7,6 +7,7 @@ import {useRootContext} from "../../root/context/useRootContext";
 import DP_Tabs from "../../../custom/data-display/tabs";
 import {filterClient} from "../../../custom/filter-client";
 import DeleteOption from "../../../custom/data-display/table/columns/delete";
+import {deleteClientUsersByClientId} from "../../../api/external";
 import TabPane = Tabs.TabPane;
 
 export const Domain: React.FC = () => {
@@ -90,7 +91,9 @@ export const Domain: React.FC = () => {
                         } onOk={
                         () => {
                             deleteClient(realmId, text).then(r => {
-                                setReloadData("clients")
+                                deleteClientUsersByClientId(realmId, text).then(() => {
+                                    setReloadData("clients")
+                                })
                             })
                         }
 

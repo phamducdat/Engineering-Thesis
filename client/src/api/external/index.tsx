@@ -94,6 +94,18 @@ export const deleteUserClients = async (
     return response?.data;
 };
 
+
+export const deleteUserClientsByUserId = async (
+    realmId: string | undefined,
+    userId: string | undefined
+) => {
+    const config: CustomAxiosRequestConfig = {
+        disableMessage: true
+    }
+    const response = await DP_externalServerAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/users/${userId}/all`, config);
+    return response?.data;
+};
+
 export const deleteClientUsers = async (
     realmId: string | undefined,
     clientId: string | undefined,
@@ -102,5 +114,16 @@ export const deleteClientUsers = async (
     const response = await DP_externalServerAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}`, {
         data: data
     });
+    return response?.data;
+}
+
+export const deleteClientUsersByClientId = async (
+    realmId: string | undefined,
+    clientId: string | undefined,
+) => {
+    const config: CustomAxiosRequestConfig = {
+        disableMessage: true
+    }
+    const response = await DP_externalServerAxios.delete(`${baseExternalUrl}/admin/realms/${realmId}/clients/${clientId}/all`, config);
     return response?.data;
 }
